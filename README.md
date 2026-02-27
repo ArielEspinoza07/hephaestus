@@ -12,7 +12,7 @@
 
 Hephaestus gives you:
 - 🎯 Simple API for simple tasks
-- 🔒 Type-safe everywhere (PHP 8.3+)
+- 🔒 Type-safe everywhere (PHP 8.5+)
 - ⚡ Fast to write, easy to test
 - 🔧 Full Symfony power when needed
 - 🏗️ Clean architecture with SRP
@@ -22,8 +22,8 @@ Hephaestus gives you:
 
 ## Requirements
 
-> - PHP 8.5+
-> - Symfony Console 8.0+
+> PHP 8.5+
+> Symfony Console 8.0+
 
 ---
 
