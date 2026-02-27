@@ -6,6 +6,8 @@ namespace Hephaestus\Metadata;
 
 use Hephaestus\Metadata\Resolver\DescriptionAttributeResolver;
 use Hephaestus\Metadata\Resolver\HelpAttributeResolver;
+use Hephaestus\Metadata\Resolver\InputAttributeResolver;
+use Hephaestus\Metadata\Resolver\OutputAttributeResolver;
 use Hephaestus\Metadata\Resolver\SignatureAttributeResolver;
 use Hephaestus\Metadata\Resolver\UsageAttributeResolver;
 use Hephaestus\Metadata\Support\CommandMetadata;
@@ -37,6 +39,16 @@ final readonly class MetadataReader
      */
     private UsageAttributeResolver $usageResolver;
 
+    /**
+     * @var InputAttributeResolver<T> $inputResolver
+     */
+    private InputAttributeResolver $inputResolver;
+
+    /**
+     * @var OutputAttributeResolver<T> $outputResolver
+     */
+    private OutputAttributeResolver $outputResolver;
+
     public function __construct()
     {
         /** @var AttributeExtractor<T> $attributeExtractor */
@@ -45,6 +57,8 @@ final readonly class MetadataReader
         $this->descriptionResolver = new DescriptionAttributeResolver($attributeExtractor);
         $this->helpResolver = new HelpAttributeResolver($attributeExtractor);
         $this->usageResolver = new UsageAttributeResolver($attributeExtractor);
+        $this->inputResolver = new InputAttributeResolver($attributeExtractor);
+        $this->outputResolver = new OutputAttributeResolver($attributeExtractor);
     }
 
     /**
@@ -61,6 +75,8 @@ final readonly class MetadataReader
             signature: $this->signatureResolver->resolve($reflectionClass),
             description: $this->descriptionResolver->resolve($reflectionClass),
             help: $this->helpResolver->resolve($reflectionClass),
+            hasInput: $this->inputResolver->resolve($reflectionClass),
+            hasOutput: $this->outputResolver->resolve($reflectionClass),
             usages: $this->usageResolver->resolve($reflectionClass),
         );
     }

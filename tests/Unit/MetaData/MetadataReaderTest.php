@@ -27,5 +27,9 @@ test('reads attributes from a Command class', function () {
         ->and($metadata->help)->toBeString()
         ->and($metadata->help)->toBe('This is a test command')
         ->and($metadata->usages)->toBeArray()
-        ->and($metadata->usages)->toHaveCount(1);
+        ->and($metadata->usages)->toHaveCount(1)
+        ->and($metadata->hasInput)->toBeBool()
+        ->and($metadata->hasInput)->toBeFalse()
+        ->and($metadata->hasOutput)->toBeBool()
+        ->and($metadata->hasOutput)->toBeFalse();
 });
