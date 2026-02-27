@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Hephaestus\Tests;
 
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 /**
  * Base class for integration tests.
@@ -37,8 +38,8 @@ abstract class IntegrationTestCase extends TestCase
 
         $process = proc_open($command, $descriptors, $pipes);
 
-        if (!is_resource($process)) {
-            throw new \RuntimeException("Failed to execute command: {$command}");
+        if (! is_resource($process)) {
+            throw new RuntimeException("Failed to execute command: {$command}");
         }
 
         fclose($pipes[0]); // Close stdin
