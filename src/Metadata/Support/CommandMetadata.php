@@ -13,6 +13,8 @@ final readonly class CommandMetadata
         public string $signature,
         public ?string $description = null,
         public ?string $help = null,
+        public bool $hasInput = false,
+        public bool $hasOutput = false,
         public array $usages = [],
     ) {}
 }
