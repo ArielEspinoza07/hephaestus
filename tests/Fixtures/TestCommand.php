@@ -13,4 +13,10 @@ use Hephaestus\Attributes\Usage;
 #[Description('Test command')]
 #[Help('This is a test command')]
 #[Usage(['app:test'])]
-final class TestCommand {}
+final class TestCommand
+{
+    public function __invoke(): int
+    {
+        return 0;
+    }
+}

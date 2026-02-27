@@ -31,5 +31,7 @@ test('reads attributes from a Command class', function () {
         ->and($metadata->hasInput)->toBeBool()
         ->and($metadata->hasInput)->toBeFalse()
         ->and($metadata->hasOutput)->toBeBool()
-        ->and($metadata->hasOutput)->toBeFalse();
+        ->and($metadata->hasOutput)->toBeFalse()
+        ->and($metadata->parameters)->toBeArray()
+        ->and($metadata->parameters)->toBeEmpty();
 });
