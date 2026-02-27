@@ -1,0 +1,51 @@
+{
+    "name": "arielespinoza07/hephaestus",
+    "description": "Forge powerful CLI tools with ease - A modern, type-safe wrapper around Symfony Console",
+    "type": "library",
+    "license": "MIT",
+    "keywords": ["cli", "console", "command", "terminal"],
+    "authors": [
+        {
+            "name": "Ariel Espinoza",
+            "email": "arielespinoza46@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.5",
+        "symfony/console": "^8.0.6"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.27.1",
+        "phpstan/phpstan": "^2.1.40",
+        "pestphp/pest": "^4.4.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Hephaestus\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Hephaestus\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "lint": "pint --test",
+        "lint:fix": "pint --test",
+        "analyse": "phpstan analyse",
+        "test": "pest",
+        "test:coverage": "pest --coverage",
+        "check": [
+            "@lint",
+            "@analyse",
+            "@test"
+        ]
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}
