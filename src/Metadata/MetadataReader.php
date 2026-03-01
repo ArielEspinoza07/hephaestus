@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Hephaestus\Metadata;
 
+use Hephaestus\Console\Command;
 use Hephaestus\Metadata\Resolver\DescriptionAttributeResolver;
 use Hephaestus\Metadata\Resolver\HelpAttributeResolver;
 use Hephaestus\Metadata\Resolver\InputAttributeResolver;
@@ -81,16 +82,8 @@ final readonly class MetadataReader
     {
         /** @var ReflectionClass<T> $reflectionClass */
         $reflectionClass = new ReflectionClass($className);
-
-        if (! $this->hasInvokeMethod($reflectionClass)) {
-            throw new RuntimeException(
-                message: sprintf(
-                    'Command class "%s" must have an "%s" method',
-                    $className,
-                    self::DEFAULT_COMMAND_METHOD,
-                ),
-            );
-        }
+        $this->checkParentClass($reflectionClass);
+        $this->checkInvokeMethod($reflectionClass);
 
         $parameters = $this->getMethodParameters($reflectionClass);
 
@@ -109,12 +102,37 @@ final readonly class MetadataReader
     /**
      * @param ReflectionClass<T> $class
      */
-    private function hasInvokeMethod(ReflectionClass $class): bool
+    private function checkParentClass(ReflectionClass $class): void
     {
-        return array_find(
+        if ($class->getParentClass() === false || $class->getParentClass()->getName() !== Command::class) {
+            throw new RuntimeException(
+                message: sprintf(
+                    'Command class "%s" must extend "%s"',
+                    $class->getName(),
+                    Command::class,
+                ),
+            );
+        }
+    }
+
+    /**
+     * @param ReflectionClass<T> $class
+     */
+    private function checkInvokeMethod(ReflectionClass $class): void
+    {
+        $method = array_find(
             array: $class->getMethods(),
             callback: fn (ReflectionMethod $method) => $method->getName() === self::DEFAULT_COMMAND_METHOD,
-        ) !== null;
+        );
+        if ($method === null) {
+            throw new RuntimeException(
+                message: sprintf(
+                    'Command class "%s" must have an "%s" method',
+                    $class->getName(),
+                    self::DEFAULT_COMMAND_METHOD,
+                ),
+            );
+        }
     }
 
     /**
