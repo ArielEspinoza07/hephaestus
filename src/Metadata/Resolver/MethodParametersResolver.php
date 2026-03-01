@@ -6,10 +6,11 @@ namespace Hephaestus\Metadata\Resolver;
 
 use Hephaestus\Attributes\Argument;
 use Hephaestus\Attributes\CompositeInput;
-use Hephaestus\Metadata\Support\ArgumentMetadataContract;
+use Hephaestus\Attributes\Option;
+use Hephaestus\Metadata\Resolver\Concerns\HasParameter;
+use Hephaestus\Metadata\Support\InputMetadataContract;
 use ReflectionAttribute;
-use ReflectionIntersectionType;
-use ReflectionUnionType;
+use ReflectionException;
 use RuntimeException;
 use ReflectionNamedType;
 use ReflectionParameter;
@@ -19,6 +20,8 @@ use ReflectionParameter;
  */
 final readonly class MethodParametersResolver
 {
+    use HasParameter;
+
     /**
      * @var ArgumentAttributeResolver<T> $argumentResolver
      */
@@ -29,108 +32,86 @@ final readonly class MethodParametersResolver
      */
     private CompositeInputAttributeResolver $compositeInputResolver;
 
+    /**
+     * @var OptionAttributeResolver<T> $optionResolver
+     */
+    private OptionAttributeResolver $optionResolver;
+
     public function __construct()
     {
         $this->argumentResolver = new ArgumentAttributeResolver();
-        $this->compositeInputResolver = new CompositeInputAttributeResolver($this->argumentResolver);
+        $this->optionResolver = new OptionAttributeResolver();
+        $this->compositeInputResolver = new CompositeInputAttributeResolver(
+            argumentResolver: $this->argumentResolver,
+            optionResolver: $this->optionResolver,
+        );
     }
 
     /**
      * @param list<ReflectionParameter> $methodParameters
-     * @return list<ArgumentMetadataContract>
+     * @return list<InputMetadataContract>
+     * @throws ReflectionException
      */
     public function resolve(array $methodParameters): array
     {
         $parameters = [];
         foreach ($methodParameters as $parameter) {
-            $argumentAttribute = array_first($parameter->getAttributes(Argument::class));
-            $compositeInputAttribute = array_first($parameter->getAttributes(CompositeInput::class));
-            $this->checkParameterType($parameter);
+            $this->hasMultipleAttributes($parameter);
+            $this->hasParameterType($parameter);
 
             /** @var ReflectionNamedType $parameterType */
             $parameterType = $parameter->getType();
-
-            $this->checkIfArgumentAttributeIsSetOnTypeClassParameter($parameterType, $parameter, $argumentAttribute);
-            $this->checkIfCompositeInputAttributeIsSetOnNotTypeClassParameter($parameterType, $parameter, $compositeInputAttribute);
-            if ($argumentAttribute && ! $compositeInputAttribute && ! class_exists($parameterType->getName())) {
-                $parameters[] = $this->argumentResolver->resolve($parameter);
-            }
-            if (! $argumentAttribute && $compositeInputAttribute && class_exists($parameterType->getName())) {
-                $parameters[] = $this->compositeInputResolver->resolve($parameter);
-            }
+            $attribute = array_first($parameter->getAttributes());
+            $this->checkIfParameterTypeIsAllowedByAttribute($parameter, $parameterType, $attribute);
+            $parameters[] = match ($attribute->getName()) {
+                Argument::class => $this->argumentResolver->resolve($parameter),
+                Option::class => $this->optionResolver->resolve($parameter),
+                CompositeInput::class => $this->compositeInputResolver->resolve($parameter),
+                default => throw new RuntimeException(
+                    message: sprintf(
+                        'Attribute %s is not supported.',
+                        $attribute->getName(),
+                    )
+                ),
+            };
         }
 
         return $parameters;
     }
 
     /**
-     * @param ReflectionAttribute<T>|null $compositeInputAttribute
-     * @param ReflectionNamedType $parameterType
-     * @param ReflectionParameter $parameter
-     * @return void
+     * @param ReflectionAttribute<T> $attribute
      */
-    public function checkIfCompositeInputAttributeIsSetOnNotTypeClassParameter(
-        ReflectionNamedType $parameterType,
+    private function checkIfParameterTypeIsAllowedByAttribute(
         ReflectionParameter $parameter,
-        ?ReflectionAttribute $compositeInputAttribute,
+        ReflectionNamedType $parameterType,
+        ReflectionAttribute $attribute,
     ): void {
-        if ($compositeInputAttribute && !class_exists($parameterType->getName())) {
+        if ($attribute->getName() === Argument::class && class_exists($parameterType->getName())) {
             throw new RuntimeException(
                 message: sprintf(
-                    'Incorrect attribute #[CompositeInput] on property %s in class %s.',
-                    $parameter->getName(),
-                    $parameter->getDeclaringClass()->getName()
-                )
-            );
-        }
-    }
-
-    /**
-     * @param ReflectionParameter $parameter
-     * @return void
-     */
-    private function checkParameterType(ReflectionParameter $parameter): void
-    {
-        if (! $parameter->hasType()) {
-            throw new RuntimeException(
-                message: sprintf(
-                    'Missing type declaration on property %s in class %s.',
+                    'Incorrect type declaration on parameter %s in class %s.',
                     $parameter->getName(),
                     $parameter->getDeclaringClass()->getName(),
                 ),
             );
         }
-
-        if ($parameter->getType() instanceof ReflectionUnionType
-            || $parameter->getType() instanceof ReflectionIntersectionType) {
+        if ($attribute->getName() === Option::class && class_exists($parameterType->getName())) {
             throw new RuntimeException(
                 message: sprintf(
-                    'Union and intersection types are not supported on property %s in class %s.',
+                    'Incorrect type declaration on parameter %s in class %s.',
                     $parameter->getName(),
                     $parameter->getDeclaringClass()->getName(),
                 ),
             );
         }
-    }
-
-    /**
-     * @param ReflectionNamedType $parameterType
-     * @param ReflectionParameter $parameter
-     * @param ReflectionAttribute<T>|null $argumentAttribute
-     * @return void
-     */
-    private function checkIfArgumentAttributeIsSetOnTypeClassParameter(
-        ReflectionNamedType $parameterType,
-        ReflectionParameter $parameter,
-        ?ReflectionAttribute $argumentAttribute,
-    ): void {
-        if ($argumentAttribute && class_exists($parameterType->getName())) {
+        if ($attribute->getName() === CompositeInput::class && ! class_exists($parameterType->getName())) {
             throw new RuntimeException(
                 message: sprintf(
-                    'Incorrect attribute #[Argument] on property %s in class %s.',
+                    'Incorrect type declaration on parameter %s in class %s.',
                     $parameter->getName(),
-                    $parameter->getDeclaringClass()->getName()
-                )
+                    $parameter->getDeclaringClass()->getName(),
+                ),
             );
         }
     }
