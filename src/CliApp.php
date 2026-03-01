@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Hephaestus;
 
 use Exception;
+use Hephaestus\Bridge\SymfonyCommandBridge;
+use Hephaestus\Metadata\MetadataReader;
+use ReflectionException;
 use Symfony\Component\Console\Application;
 
 final readonly class CliApp
@@ -24,16 +27,32 @@ final readonly class CliApp
         );
     }
 
+    /**
+     * @throws ReflectionException
+     */
     public function registerCommands(string $directory): self
     {
-        /** TODO:
-         * 1. Read all the file names in the given directory
-         * 2. Create variable to store CommandMetadata: $commands
-         * 3. Iterate through the file names
-         * 4. Use MetadataReader to obtain CommandMetadata and store it in $commands.
-         * 5. Use SymfonyCommandBridge to convert CommandMetadata to Symfony Command
-         * 6. Register the Symfony Command with the Application
-         */
+        $reader = new MetadataReader();
+        $bridge = new SymfonyCommandBridge();
+
+        $files = glob(mb_rtrim($directory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . '*.php') ?: [];
+
+        $commands = [];
+
+        foreach ($files as $file) {
+            $className = $this->resolveClassName($file);
+            if ($className !== null) {
+                $commands[] = $reader->read($className);
+            }
+        }
+
+        $symfonyCommands = [];
+
+        foreach ($commands as $metadata) {
+            $symfonyCommands[] = $bridge->convert($metadata);
+        }
+
+        $this->app->addCommands($symfonyCommands);
 
         return $this;
     }
@@ -44,5 +63,16 @@ final readonly class CliApp
     public function run(): int
     {
         return $this->app->run();
+    }
+
+    private function resolveClassName(string $file): ?string
+    {
+        $before = get_declared_classes();
+        require_once $file;
+        $after = get_declared_classes();
+
+        $new = array_values(array_diff($after, $before));
+
+        return count($new) === 1 ? $new[0] : null;
     }
 }
