@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace Hephaestus\Metadata\Resolver;
 
-use Hephaestus\Metadata\Support\ArgumentMetadataContract;
+use Hephaestus\Attributes\Argument;
+use Hephaestus\Attributes\Option;
+use Hephaestus\Metadata\Resolver\Concerns\HasParameter;
+use Hephaestus\Metadata\Support\InputMetadataContract;
 use Hephaestus\Metadata\Support\CompositeInputMetadata;
+use ReflectionAttribute;
 use RuntimeException;
 use ReflectionClass;
 use ReflectionException;
@@ -17,11 +21,15 @@ use ReflectionParameter;
  */
 final readonly class CompositeInputAttributeResolver
 {
+    use HasParameter;
+
     /**
-     * @param ArgumentAttributeResolver<T> $argumentAttributeResolver
+     * @param ArgumentAttributeResolver<T> $argumentResolver
+     * @param OptionAttributeResolver<T> $optionResolver
      */
     public function __construct(
-        private ArgumentAttributeResolver $argumentAttributeResolver,
+        private ArgumentAttributeResolver $argumentResolver,
+        private OptionAttributeResolver $optionResolver,
     ) {}
 
     /**
@@ -40,7 +48,7 @@ final readonly class CompositeInputAttributeResolver
 
     /**
      * @param class-string $targetClass
-     * @return list<ArgumentMetadataContract>
+     * @return list<InputMetadataContract>
      * @throws ReflectionException
      */
     private function getProperties(string $targetClass): array
@@ -52,11 +60,55 @@ final readonly class CompositeInputAttributeResolver
             );
         }
 
-        $properties = [];
+        $parameters = [];
         foreach ($reflectionClass->getConstructor()->getParameters() as $parameter) {
-            $properties[] = $this->argumentAttributeResolver->resolve($parameter);
+            $this->hasMultipleAttributes($parameter);
+            $this->hasParameterType($parameter);
+
+            /** @var ReflectionNamedType $parameterType */
+            $parameterType = $parameter->getType();
+            $attribute = array_first($parameter->getAttributes());
+            $this->checkIfParameterTypeIsAllowedByAttribute($parameter, $parameterType, $attribute);
+            $parameters[] = match ($attribute->getName()) {
+                Argument::class => $this->argumentResolver->resolve($parameter),
+                Option::class => $this->optionResolver->resolve($parameter),
+                default => throw new RuntimeException(
+                    message: sprintf(
+                        'Attribute %s is not supported.',
+                        $attribute->getName(),
+                    )
+                ),
+            };
         }
 
-        return $properties;
+        return $parameters;
+    }
+
+    /**
+     * @param ReflectionAttribute<T> $attribute
+     */
+    private function checkIfParameterTypeIsAllowedByAttribute(
+        ReflectionParameter $parameter,
+        ReflectionNamedType $parameterType,
+        ReflectionAttribute $attribute,
+    ): void {
+        if ($attribute->getName() === Argument::class && class_exists($parameterType->getName())) {
+            throw new RuntimeException(
+                message: sprintf(
+                    'Incorrect type declaration on parameter %s in class %s.',
+                    $parameter->getName(),
+                    $parameter->getDeclaringClass()->getName(),
+                ),
+            );
+        }
+        if ($attribute->getName() === Option::class && class_exists($parameterType->getName())) {
+            throw new RuntimeException(
+                message: sprintf(
+                    'Incorrect type declaration on parameter %s in class %s.',
+                    $parameter->getName(),
+                    $parameter->getDeclaringClass()->getName(),
+                ),
+            );
+        }
     }
 }
