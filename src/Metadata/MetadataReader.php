@@ -25,7 +25,7 @@ use RuntimeException;
  */
 final readonly class MetadataReader
 {
-    private const string DEFAULT_COMMAND_METHOD = '__invoke';
+    private const string DEFAULT_COMMAND_METHOD = 'execute';
     /**
      * @var SignatureAttributeResolver<T> $signatureResolver
      */
