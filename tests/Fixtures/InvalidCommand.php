@@ -10,12 +10,13 @@ use Hephaestus\Attributes\Description;
 use Hephaestus\Attributes\Help;
 use Hephaestus\Attributes\Signature;
 use Hephaestus\Attributes\Usage;
+use Hephaestus\Console\Command;
 
 #[Signature('app:test')]
 #[Description('Test command')]
 #[Help('This is a test command')]
 #[Usage(['app:test'])]
-final class InvalidCommand
+final readonly class InvalidCommand extends Command
 {
     public function __invoke(
         #[Argument]

@@ -8,12 +8,13 @@ use Hephaestus\Attributes\Description;
 use Hephaestus\Attributes\Help;
 use Hephaestus\Attributes\Signature;
 use Hephaestus\Attributes\Usage;
+use Hephaestus\Console\Command;
 
 #[Signature('app:test')]
 #[Description('Test command')]
 #[Help('This is a test command')]
 #[Usage(['app:test'])]
-final class TestCommand
+final readonly class TestCommand extends Command
 {
     public function __invoke(): int
     {

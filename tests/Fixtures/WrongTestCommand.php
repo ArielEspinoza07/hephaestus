@@ -7,8 +7,9 @@ namespace Hephaestus\Tests\Fixtures;
 use Hephaestus\Attributes\Description;
 use Hephaestus\Attributes\Help;
 use Hephaestus\Attributes\Usage;
+use Hephaestus\Console\Command;
 
 #[Description('Test command')]
 #[Help('This is a test command')]
 #[Usage(['app:test'])]
-final class WrongTestCommand {}
+final readonly class WrongTestCommand extends Command {}

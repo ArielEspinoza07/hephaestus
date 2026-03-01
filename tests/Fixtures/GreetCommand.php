@@ -9,11 +9,12 @@ use Hephaestus\Attributes\Description;
 use Hephaestus\Attributes\Option;
 use Hephaestus\Attributes\Output;
 use Hephaestus\Attributes\Signature;
+use Hephaestus\Console\Command;
 
 #[Signature('app:greet')]
 #[Description('Greets a user')]
 #[Output]
-final class GreetCommand
+final readonly class GreetCommand extends Command
 {
     public function __invoke(
         #[Argument(description: 'The name of the user to greet')]

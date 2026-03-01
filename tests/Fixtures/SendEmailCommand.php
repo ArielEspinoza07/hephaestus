@@ -8,11 +8,12 @@ use Hephaestus\Attributes\CompositeInput;
 use Hephaestus\Attributes\Description;
 use Hephaestus\Attributes\Output;
 use Hephaestus\Attributes\Signature;
+use Hephaestus\Console\Command;
 
 #[Signature('app:send-email')]
 #[Description('send an email')]
 #[Output]
-final class SendEmailCommand
+final readonly class SendEmailCommand extends Command
 {
     public function __invoke(
         #[CompositeInput]
