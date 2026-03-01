@@ -11,7 +11,7 @@ use Hephaestus\Metadata\Resolver\MethodParametersResolver;
 use Hephaestus\Metadata\Resolver\OutputAttributeResolver;
 use Hephaestus\Metadata\Resolver\SignatureAttributeResolver;
 use Hephaestus\Metadata\Resolver\UsageAttributeResolver;
-use Hephaestus\Metadata\Support\ArgumentMetadataContract;
+use Hephaestus\Metadata\Support\InputMetadataContract;
 use Hephaestus\Metadata\Support\CommandMetadata;
 use ReflectionClass;
 use ReflectionException;
@@ -92,15 +92,17 @@ final readonly class MetadataReader
             );
         }
 
+        $parameters = $this->getMethodParameters($reflectionClass);
+
         return new CommandMetadata(
             target: $className,
             signature: $this->signatureResolver->resolve($reflectionClass),
             description: $this->descriptionResolver->resolve($reflectionClass),
             help: $this->helpResolver->resolve($reflectionClass),
-            hasInput: $this->inputResolver->resolve($reflectionClass),
+            hasInput: count($parameters) > 0 ? false : $this->inputResolver->resolve($reflectionClass),
             hasOutput: $this->outputResolver->resolve($reflectionClass),
             usages: $this->usageResolver->resolve($reflectionClass),
-            parameters: $this->getMethodParameters($reflectionClass),
+            parameters: $parameters,
         );
     }
 
@@ -117,14 +119,19 @@ final readonly class MetadataReader
 
     /**
      * @param ReflectionClass<T> $class
-     * @return list<ArgumentMetadataContract>
+     * @return list<InputMetadataContract>
      * @throws ReflectionException
      */
     private function getMethodParameters(ReflectionClass $class): array
     {
+        $parameters = $class->getMethod(self::DEFAULT_COMMAND_METHOD)->getParameters();
+        if (count($parameters) === 0) {
+            return [];
+        }
+
         return $this->methodParametersResolver
             ->resolve(
-                methodParameters: $class->getMethod(self::DEFAULT_COMMAND_METHOD)->getParameters(),
+                methodParameters: $parameters,
             );
     }
 }
