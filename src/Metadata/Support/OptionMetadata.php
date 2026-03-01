@@ -23,4 +23,9 @@ final readonly class OptionMetadata
     {
         return $this->default !== null;
     }
+
+    public function isArray(): bool
+    {
+        return $this->type === 'array';
+    }
 }
