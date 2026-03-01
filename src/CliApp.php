@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Hephaestus;
 
 use Exception;
+use Hephaestus\Cache\CommandCache;
 use ReflectionException;
 use Symfony\Component\Console\Application;
 
@@ -28,9 +29,12 @@ final readonly class CliApp
     /**
      * @throws ReflectionException
      */
-    public function registerCommands(string $directory): self
+    public function registerCommands(string $directory, ?string $cachePath = null): self
     {
-        $this->app->addCommands(new CommandLoader()->load($directory));
+        $loader = new CommandLoader(
+            cache: $cachePath !== null ? new CommandCache($cachePath) : null,
+        );
+        $this->app->addCommands($loader->load($directory));
 
         return $this;
     }
