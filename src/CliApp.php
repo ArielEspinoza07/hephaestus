@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Hephaestus;
 
 use Exception;
-use Hephaestus\Bridge\SymfonyCommandBridge;
-use Hephaestus\Metadata\MetadataReader;
 use ReflectionException;
 use Symfony\Component\Console\Application;
 
@@ -32,27 +30,7 @@ final readonly class CliApp
      */
     public function registerCommands(string $directory): self
     {
-        $reader = new MetadataReader();
-        $bridge = new SymfonyCommandBridge();
-
-        $files = glob(mb_rtrim($directory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . '*.php') ?: [];
-
-        $commands = [];
-
-        foreach ($files as $file) {
-            $className = $this->resolveClassName($file);
-            if ($className !== null) {
-                $commands[] = $reader->read($className);
-            }
-        }
-
-        $symfonyCommands = [];
-
-        foreach ($commands as $metadata) {
-            $symfonyCommands[] = $bridge->convert($metadata);
-        }
-
-        $this->app->addCommands($symfonyCommands);
+        $this->app->addCommands(new CommandLoader()->load($directory));
 
         return $this;
     }
@@ -65,14 +43,5 @@ final readonly class CliApp
         return $this->app->run();
     }
 
-    private function resolveClassName(string $file): ?string
-    {
-        $before = get_declared_classes();
-        require_once $file;
-        $after = get_declared_classes();
 
-        $new = array_values(array_diff($after, $before));
-
-        return count($new) === 1 ? $new[0] : null;
-    }
 }
