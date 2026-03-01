@@ -18,6 +18,9 @@ abstract readonly class Command implements CommandInterface
     use HasInput;
     use HasOutput;
 
+    protected const int SUCCESS = 0;
+    protected const int FAILURE = 1;
+
     public function __construct(
         private ?InputInterface $input = null,
         private ?OutputInterface $output = null,
