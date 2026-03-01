@@ -9,5 +9,6 @@ use Hephaestus\CliApp;
 
 exit(
     CliApp::create('Hephaestus', '1.0.0')
+        ->registerCommands(dirname(__DIR__) . '/src/Console/Commands')
         ->run()
 );
