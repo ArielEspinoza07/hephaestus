@@ -50,10 +50,10 @@ final readonly class SymfonyCommandBridge
         $symfonyCommand->setCode(function (InputInterface $input, OutputInterface $output) use ($metadata) {
             $class = new $metadata->target();
             if ($metadata->hasInput) {
-                $class->setInput($input);
+                $class = $class->withInput($input);
             }
             if ($metadata->hasOutput) {
-                $class->setOutput($output);
+                $class = $class->withOutput($output);
             }
             $parameters = $this->convertSymfonyInputsToInternals($input, $metadata->parameters);
 
