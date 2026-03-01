@@ -12,4 +12,4 @@ use Hephaestus\Console\Command;
 #[Description('Test command')]
 #[Help('This is a test command')]
 #[Usage(['app:test'])]
-final readonly class WrongTestCommand extends Command {}
+final readonly class NoSignatureCommand extends Command {}
