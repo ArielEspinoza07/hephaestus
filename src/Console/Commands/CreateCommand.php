@@ -16,7 +16,7 @@ use Hephaestus\Console\Command;
 #[Output]
 final readonly class CreateCommand extends Command
 {
-    public function __invoke(
+    public function execute(
         #[Argument(description: 'The name of the command class to create')]
         string $name,
         #[Option(description: 'Overwrite the file if it already exists', shortcut: 'f')]
