@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Hephaestus\Metadata\Resolver\SignatureAttributeResolver;
 use Hephaestus\Tests\Fixtures\TestCommand;
-use Hephaestus\Tests\Fixtures\WrongTestCommand;
+use Hephaestus\Tests\Fixtures\NoSignatureCommand;
 
 beforeEach(function () {
     $this->resolver = new SignatureAttributeResolver(
@@ -20,5 +20,5 @@ test('extracts signature from class attribute', function () {
 });
 
 test('throws exception when no attribute is found', function () {
-    $this->resolver->resolve(new ReflectionClass(WrongTestCommand::class));
+    $this->resolver->resolve(new ReflectionClass(NoSignatureCommand::class));
 })->throws(RuntimeException::class);
