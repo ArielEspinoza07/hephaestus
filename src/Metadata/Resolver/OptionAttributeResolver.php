@@ -27,14 +27,20 @@ final class OptionAttributeResolver
         $option = $attribute->newInstance();
         /** @var ReflectionNamedType $parameterType */
         $parameterType = $parameter->getType();
+
         $type = mb_strtolower($parameterType->getName());
+
+        $default = $parameter->isDefaultValueAvailable() ? $parameter->getDefaultValue() : $option->default;
+        if ($type === 'bool') {
+            $default = null;
+        }
 
         return new OptionMetadata(
             name: $parameter->getName(),
             type: $type,
             description: $option->description,
-            acceptValue: $type === 'bool' ? true : $option->acceptValue,
-            default: $parameter->isDefaultValueAvailable() ? $parameter->getDefaultValue() : $option->default,
+            acceptValue: $type === 'bool' ? false : $option->acceptValue,
+            default: $default,
             shortcut: $option->shortcut,
         );
     }
