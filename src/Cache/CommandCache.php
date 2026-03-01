@@ -11,7 +11,7 @@ use Hephaestus\Metadata\Support\OptionMetadata;
 
 final class CommandCache
 {
-    /** @var array<string, array{mtime: int, metadata: CommandMetadata}> */
+    /** @var array<string, array{hash: string, metadata: CommandMetadata}> */
     private array $data = [];
 
     private bool $loaded = false;
@@ -29,7 +29,7 @@ final class CommandCache
             return null;
         }
 
-        if ($this->isStale($file, $entry['mtime'])) {
+        if ($this->isStale($file, $entry['hash'])) {
             unset($this->data[$file]);
             $this->dirty = true;
 
@@ -42,7 +42,7 @@ final class CommandCache
     public function set(string $file, CommandMetadata $metadata): void
     {
         $this->data[$file] = [
-            'mtime'    => (int) filemtime($file),
+            'hash'     => hash_file('xxh3', $file),
             'metadata' => $metadata,
         ];
         $this->dirty = true;
@@ -87,8 +87,8 @@ final class CommandCache
         }
     }
 
-    private function isStale(string $file, int $cachedMtime): bool
+    private function isStale(string $file, string $cachedHash): bool
     {
-        return filemtime($file) !== $cachedMtime;
+        return hash_file('xxh3', $file) !== $cachedHash;
     }
 }
