@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Hephaestus\Metadata\Support;
 
-final readonly class OptionMetadata
+final readonly class OptionMetadata implements InputMetadataContract
 {
     /**
      * @param string|int|float|bool|array<int|string, mixed>|null $default
