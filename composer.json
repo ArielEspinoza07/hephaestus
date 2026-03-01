@@ -10,6 +10,7 @@
             "email": "arielespinoza46@gmail.com"
         }
     ],
+    "bin": ["bin/hephaestus"],
     "require": {
         "php": "^8.5",
         "symfony/console": "^8.0.6"
