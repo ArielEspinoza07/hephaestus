@@ -8,6 +8,7 @@ final readonly class CommandMetadata
 {
     /**
      * @param list<string> $usages
+     * @param list<string> $aliases
      * @param list<InputMetadataContract> $parameters
      */
     public function __construct(
@@ -18,6 +19,7 @@ final readonly class CommandMetadata
         public bool $hasInput = false,
         public bool $hasOutput = false,
         public array $usages = [],
+        public array $aliases = [],
         public array $parameters = [],
     ) {}
 }
