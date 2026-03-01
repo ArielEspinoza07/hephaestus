@@ -29,6 +29,40 @@ test('extracts options from reflection parameter', function () {
     }
 
     expect($options)->not->toBeEmpty()
-        ->and($options)->toHaveCount(1)
-        ->and(array_first($options))->toBeInstanceOf(OptionMetadata::class);
+        ->and($options)->toHaveCount(1);
+});
+
+test('returns OptionMetadata', function () {
+    $method = new ReflectionMethod(GreetCommand::class, '__invoke');
+    $options = [];
+    $parameters = array_filter(
+        array: $method->getParameters(),
+        callback: function (ReflectionParameter $parameter) {
+            return array_filter(
+                array: $parameter->getAttributes(),
+                callback: fn (ReflectionAttribute $attribute) => $attribute->getName() === Option::class,
+            );
+        }
+    );
+
+    foreach ($parameters as $parameter) {
+        $options[] = $this->resolver->resolve($parameter);
+    }
+
+    $parameter = array_last($options);
+
+    expect($parameter)->toBeInstanceOf(OptionMetadata::class)
+        ->and($parameter->name)->toBeString()
+        ->and($parameter->name)->toBe('loud')
+        ->and($parameter->type)->toBeString()
+        ->and($parameter->type)->toBe('bool')
+        ->and($parameter->description)->toBeString()
+        ->and($parameter->description)->toBe('Whether to greet the user in a loud voice')
+        ->and($parameter->acceptValue)->toBeBool()
+        ->and($parameter->acceptValue)->toBeTrue()
+        ->and($parameter->default)->toBeNull()
+        ->and($parameter->isArray())->toBeBool()
+        ->and($parameter->isArray())->toBeFalse()
+        ->and($parameter->hasDefault())->toBeBool()
+        ->and($parameter->hasDefault())->toBeFalse();
 });

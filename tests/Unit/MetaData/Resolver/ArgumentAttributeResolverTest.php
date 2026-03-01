@@ -29,6 +29,40 @@ test('extracts arguments from reflection parameter', function () {
     }
 
     expect($arguments)->not->toBeEmpty()
-        ->and($arguments)->toHaveCount(1)
-        ->and(array_first($arguments))->toBeInstanceOf(ArgumentMetadata::class);
+        ->and($arguments)->toHaveCount(1);
+});
+
+test('returns ArgumentMetadata', function () {
+    $method = new ReflectionMethod(GreetCommand::class, '__invoke');
+    $arguments = [];
+    $parameters = array_filter(
+        array: $method->getParameters(),
+        callback: function (ReflectionParameter $parameter) {
+            return array_filter(
+                array: $parameter->getAttributes(),
+                callback: fn (ReflectionAttribute $attribute) => $attribute->getName() === Argument::class,
+            );
+        }
+    );
+
+    foreach ($parameters as $parameter) {
+        $arguments[] = $this->resolver->resolve($parameter);
+    }
+
+    $parameter = array_first($arguments);
+
+    expect($parameter)->toBeInstanceOf(ArgumentMetadata::class)
+        ->and($parameter->name)->toBeString()
+        ->and($parameter->name)->toBe('name')
+        ->and($parameter->type)->toBeString()
+        ->and($parameter->type)->toBe('string')
+        ->and($parameter->description)->toBeString()
+        ->and($parameter->description)->toBe('The name of the user to greet')
+        ->and($parameter->isRequired)->toBeBool()
+        ->and($parameter->isRequired)->toBeTrue()
+        ->and($parameter->default)->toBeNull()
+        ->and($parameter->isArray())->toBeBool()
+        ->and($parameter->isArray())->toBeFalse()
+        ->and($parameter->hasDefault())->toBeBool()
+        ->and($parameter->hasDefault())->toBeFalse();
 });
