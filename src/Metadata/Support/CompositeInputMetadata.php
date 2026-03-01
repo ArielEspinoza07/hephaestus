@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Hephaestus\Metadata\Support;
 
-final readonly class CompositeInputMetadata implements ArgumentMetadataContract
+final readonly class CompositeInputMetadata implements InputMetadataContract
 {
     /**
-     * @param list<ArgumentMetadataContract> $properties
+     * @param list<InputMetadataContract> $properties
      */
     public function __construct(
         public string $target,
