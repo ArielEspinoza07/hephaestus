@@ -57,7 +57,7 @@ final readonly class SymfonyCommandBridge
             }
             $parameters = $this->convertSymfonyInputsToInternals($input, $metadata->parameters);
 
-            return $class->__invoke(...$parameters);
+            return $class->execute(...$parameters);
         });
 
         return $symfonyCommand;
