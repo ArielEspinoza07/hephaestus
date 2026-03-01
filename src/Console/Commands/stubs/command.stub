@@ -1,0 +1,21 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ namespace }};
+
+use Hephaestus\Attributes\Description;
+use Hephaestus\Attributes\Output;
+use Hephaestus\Attributes\Signature;
+use Hephaestus\Console\Command;
+
+#[Signature('{{ signature }}')]
+#[Description('')]
+#[Output]
+final readonly class {{ className }} extends Command
+{
+    public function __invoke(): int
+    {
+        return self::SUCCESS;
+    }
+}
