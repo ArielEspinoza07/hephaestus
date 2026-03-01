@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Hephaestus\Metadata\Resolver;
 
 use Hephaestus\Attributes\Argument;
-use Hephaestus\Metadata\Support\SimpleArgumentMetadata;
+use Hephaestus\Metadata\Support\ArgumentMetadata;
 use ReflectionAttribute;
 use ReflectionNamedType;
 use ReflectionParameter;
@@ -17,9 +17,9 @@ final readonly class ArgumentAttributeResolver
 {
     /**
      * @param ReflectionParameter $parameter
-     * @return SimpleArgumentMetadata
+     * @return ArgumentMetadata
      */
-    public function resolve(ReflectionParameter $parameter): SimpleArgumentMetadata
+    public function resolve(ReflectionParameter $parameter): ArgumentMetadata
     {
         /** @var ReflectionAttribute<T> $attribute */
         $attribute = array_filter(
@@ -32,12 +32,17 @@ final readonly class ArgumentAttributeResolver
         /** @var ReflectionNamedType $parameterType */
         $parameterType = $parameter->getType();
 
-        return new SimpleArgumentMetadata(
+        $isRequired = $argument->required;
+        if ($parameter->isDefaultValueAvailable()) {
+            $isRequired = false;
+        }
+
+        return new ArgumentMetadata(
             name: $parameter->getName(),
+            type: mb_strtolower($parameterType->getName()),
             description: $argument->description,
-            isRequired: $argument->required,
-            isArray: mb_strtolower($parameterType->getName()) === 'array',
-            defaultValue: $argument->default,
+            isRequired: $isRequired,
+            default: $parameter->isDefaultValueAvailable() ? $parameter->getDefaultValue() : $argument->default,
         );
     }
 }
