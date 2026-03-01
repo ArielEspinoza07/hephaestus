@@ -17,10 +17,10 @@ use Hephaestus\Console\Command;
 #[Output]
 final readonly class CreateUserCommand extends Command
 {
-    public function __invoke(
+    public function execute(
         #[CompositeInput]
         CreateUser $user
     ): int {
-        return 0;
+        return self::SUCCESS;
     }
 }

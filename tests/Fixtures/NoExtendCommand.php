@@ -15,7 +15,7 @@ use Hephaestus\Attributes\Usage;
 #[Usage(['app:test'])]
 final readonly class NoExtendCommand
 {
-    public function __invoke(): int
+    public function execute(): int
     {
         return 0;
     }

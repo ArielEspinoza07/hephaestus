@@ -11,7 +11,7 @@ beforeEach(function () {
 });
 
 test('resolves method parameters', function () {
-    $method = new ReflectionMethod(GreetCommand::class, '__invoke');
+    $method = new ReflectionMethod(GreetCommand::class, 'execute');
 
     $parameters = $this->resolver->resolve($method->getParameters());
 
@@ -21,7 +21,7 @@ test('resolves method parameters', function () {
 });
 
 test('throws exception when parameter has multiple attributes', function () {
-    $method = new ReflectionMethod(InvalidCommand::class, '__invoke');
+    $method = new ReflectionMethod(InvalidCommand::class, 'execute');
 
     $this->resolver->resolve($method->getParameters());
 })->throws(RuntimeException::class);

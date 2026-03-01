@@ -12,8 +12,8 @@ use Hephaestus\Console\Command;
 #[Description('Command for CliApp cache tests')]
 final readonly class CliAppCacheCommand extends Command
 {
-    public function __invoke(): int
+    public function execute(): int
     {
-        return 0;
+        return self::SUCCESS;
     }
 }

@@ -16,8 +16,8 @@ use Hephaestus\Console\Command;
 #[Usage(['app:test'])]
 final readonly class TestCommand extends Command
 {
-    public function __invoke(): int
+    public function execute(): int
     {
-        return 0;
+        return self::SUCCESS;
     }
 }

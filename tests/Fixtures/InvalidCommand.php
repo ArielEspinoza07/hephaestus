@@ -18,11 +18,11 @@ use Hephaestus\Console\Command;
 #[Usage(['app:test'])]
 final readonly class InvalidCommand extends Command
 {
-    public function __invoke(
+    public function execute(
         #[Argument]
         #[CompositeInput]
         string $name,
     ): int {
-        return 0;
+        return self::SUCCESS;
     }
 }

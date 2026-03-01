@@ -12,4 +12,10 @@ use Hephaestus\Console\Command;
 #[Signature('app:test')]
 #[Input]
 #[Output]
-final readonly class SignatureTestCommand extends Command {}
+final readonly class SignatureTestCommand extends Command
+{
+    public function execute(): int
+    {
+        return self::SUCCESS;
+    }
+}

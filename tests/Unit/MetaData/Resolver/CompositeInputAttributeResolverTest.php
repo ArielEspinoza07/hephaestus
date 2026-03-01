@@ -18,7 +18,7 @@ beforeEach(function () {
 });
 
 test('resolves composite input attribute from resolver', function () {
-    $method = new ReflectionMethod(CreateUserCommand::class, '__invoke');
+    $method = new ReflectionMethod(CreateUserCommand::class, 'execute');
     $parameters = [];
     foreach ($method->getParameters() as $parameter) {
         $parameters[] = $this->resolver->resolve($parameter);
@@ -29,7 +29,7 @@ test('resolves composite input attribute from resolver', function () {
 });
 
 test('throws exception when composite input attribute target does not have an constructor', function () {
-    $method = new ReflectionMethod(SendEmailCommand::class, '__invoke');
+    $method = new ReflectionMethod(SendEmailCommand::class, 'execute');
     foreach ($method->getParameters() as $parameter) {
         $this->resolver->resolve($parameter);
     }

@@ -12,8 +12,8 @@ use Hephaestus\Console\Command;
 #[Description('Command with cache enabled')]
 final readonly class WithCacheCommand extends Command
 {
-    public function __invoke(): int
+    public function execute(): int
     {
-        return 0;
+        return self::SUCCESS;
     }
 }

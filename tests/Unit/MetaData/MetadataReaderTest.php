@@ -80,6 +80,6 @@ test('throws exception when class does not extends from Command abstract class',
     $this->reader->read(NoExtendCommand::class);
 })->throws(RuntimeException::class, 'Command class "Hephaestus\Tests\Fixtures\NoExtendCommand" must extend "Hephaestus\Console\Command"');
 
-test('throws exception when class does not have __invoke method', function () {
+test('throws exception when class does not have execute method', function () {
     $this->reader->read(NoSignatureCommand::class);
-})->throws(RuntimeException::class, 'Command class "Hephaestus\Tests\Fixtures\NoSignatureCommand" must have an "__invoke" method');
+})->throws(RuntimeException::class, 'Command class "Hephaestus\Tests\Fixtures\NoSignatureCommand" must have an "execute" method');

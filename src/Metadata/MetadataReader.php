@@ -90,7 +90,7 @@ final readonly class MetadataReader
         /** @var ReflectionClass<T> $reflectionClass */
         $reflectionClass = new ReflectionClass($className);
         $this->checkParentClass($reflectionClass);
-        $this->checkInvokeMethod($reflectionClass);
+        $this->checkExecuteMethod($reflectionClass);
 
         $parameters = $this->getMethodParameters($reflectionClass);
 
@@ -126,7 +126,7 @@ final readonly class MetadataReader
     /**
      * @param ReflectionClass<T> $class
      */
-    private function checkInvokeMethod(ReflectionClass $class): void
+    private function checkExecuteMethod(ReflectionClass $class): void
     {
         $method = array_find(
             array: $class->getMethods(),

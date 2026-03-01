@@ -15,10 +15,10 @@ use Hephaestus\Console\Command;
 #[Output]
 final readonly class SendEmailCommand extends Command
 {
-    public function __invoke(
+    public function execute(
         #[CompositeInput]
         SendEmail $email,
     ): int {
-        return 0;
+        return self::SUCCESS;
     }
 }

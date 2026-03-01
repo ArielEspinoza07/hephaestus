@@ -12,7 +12,7 @@ beforeEach(function () {
 });
 
 test('extracts options from reflection parameter', function () {
-    $method = new ReflectionMethod(GreetCommand::class, '__invoke');
+    $method = new ReflectionMethod(GreetCommand::class, 'execute');
     $options = [];
     $parameters = array_filter(
         array: $method->getParameters(),
@@ -33,7 +33,7 @@ test('extracts options from reflection parameter', function () {
 });
 
 test('returns OptionMetadata', function () {
-    $method = new ReflectionMethod(GreetCommand::class, '__invoke');
+    $method = new ReflectionMethod(GreetCommand::class, 'execute');
     $options = [];
     $parameters = array_filter(
         array: $method->getParameters(),
