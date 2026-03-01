@@ -8,7 +8,7 @@ final readonly class CommandMetadata
 {
     /**
      * @param list<string> $usages
-     * @param list<ArgumentMetadataContract> $parameters
+     * @param list<InputMetadataContract> $parameters
      */
     public function __construct(
         public string $target,
