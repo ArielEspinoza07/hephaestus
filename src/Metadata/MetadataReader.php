@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Hephaestus\Metadata;
 
 use Hephaestus\Console\Command;
+use Hephaestus\Metadata\Resolver\AliasAttributeResolver;
 use Hephaestus\Metadata\Resolver\DescriptionAttributeResolver;
 use Hephaestus\Metadata\Resolver\HelpAttributeResolver;
 use Hephaestus\Metadata\Resolver\InputAttributeResolver;
@@ -46,6 +47,11 @@ final readonly class MetadataReader
     private UsageAttributeResolver $usageResolver;
 
     /**
+     * @var AliasAttributeResolver<T> $aliasResolver
+     */
+    private AliasAttributeResolver $aliasResolver;
+
+    /**
      * @var InputAttributeResolver<T> $inputResolver
      */
     private InputAttributeResolver $inputResolver;
@@ -68,6 +74,7 @@ final readonly class MetadataReader
         $this->descriptionResolver = new DescriptionAttributeResolver($attributeExtractor);
         $this->helpResolver = new HelpAttributeResolver($attributeExtractor);
         $this->usageResolver = new UsageAttributeResolver($attributeExtractor);
+        $this->aliasResolver = new AliasAttributeResolver($attributeExtractor);
         $this->inputResolver = new InputAttributeResolver($attributeExtractor);
         $this->outputResolver = new OutputAttributeResolver($attributeExtractor);
         $this->methodParametersResolver = new MethodParametersResolver();
@@ -95,6 +102,7 @@ final readonly class MetadataReader
             hasInput: count($parameters) > 0 ? false : $this->inputResolver->resolve($reflectionClass),
             hasOutput: $this->outputResolver->resolve($reflectionClass),
             usages: $this->usageResolver->resolve($reflectionClass),
+            aliases: $this->aliasResolver->resolve($reflectionClass),
             parameters: $parameters,
         );
     }
