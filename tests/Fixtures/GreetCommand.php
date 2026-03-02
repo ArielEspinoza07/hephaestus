@@ -20,8 +20,11 @@ final readonly class GreetCommand extends Command
         #[Argument(description: 'The name of the user to greet')]
         string $name,
         #[Option(description: 'Whether to greet the user in a loud voice', shortcut: 'l')]
-        bool $loud,
+        bool $yell,
     ): int {
+        $name = $yell ? mb_strtoupper($name) : $name;
+        $this->output->writeln(sprintf('Hello, %s!', $name));
+
         return self::SUCCESS;
     }
 }
