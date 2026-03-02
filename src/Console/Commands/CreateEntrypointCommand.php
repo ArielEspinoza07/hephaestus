@@ -58,6 +58,8 @@ final readonly class CreateEntrypointCommand extends Command
         @chmod($filePath, 0755);
 
         $this->output->writeln('<info>Entrypoint created: ' . $filePath . '</info>');
+        $this->output->writeln('');
+        $this->output->writeln('<comment>Next: add "bin": ["bin/' . $name . '"] to your composer.json, then run composer dump-autoload.</comment>');
 
         return self::SUCCESS;
     }
