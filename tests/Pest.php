@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Hephaestus\Tests\IntegrationTestCase;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,7 +15,6 @@ use Hephaestus\Tests\IntegrationTestCase;
 */
 
 // uses(TestCase::class)->in('Feature');
-uses(IntegrationTestCase::class)->in('Integration');
 
 /*
 |--------------------------------------------------------------------------
