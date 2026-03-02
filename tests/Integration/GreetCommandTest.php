@@ -23,7 +23,7 @@ test('execute greet command', function () {
 
 test('execute greet command with yell option', function () {
     $result = CommandRunner::for(GreetCommand::class)
-        ->withArgs(['name' => 'JOHN'])
+        ->withArgs(['name' => 'John'])
         ->withOptions(['yell' => true])
         ->run();
 
