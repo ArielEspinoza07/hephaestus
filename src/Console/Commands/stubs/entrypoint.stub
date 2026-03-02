@@ -1,0 +1,14 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use Hephaestus\CliApp;
+
+exit(
+    CliApp::create('{{ appName }}', '{{ version }}')
+        ->registerCommands(__DIR__ . '/../{{ commandsDir }}')
+        ->run()
+);
