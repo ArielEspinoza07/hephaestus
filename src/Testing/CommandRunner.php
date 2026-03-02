@@ -8,6 +8,7 @@ use Hephaestus\Bridge\SymfonyCommandBridge;
 use Hephaestus\Console\Command;
 use Hephaestus\Metadata\MetadataReader;
 use ReflectionException;
+use RuntimeException;
 use Symfony\Component\Console\Tester\CommandTester;
 
 final class CommandRunner
@@ -66,13 +67,24 @@ final class CommandRunner
         $input = array_merge($this->args, $this->prefixedOptions());
 
         $tester = new CommandTester($command);
-        $tester->execute($input, ['decorated' => false, 'capture_stderr_separately' => true]);
 
-        return new CommandResult(
-            exitCode: $tester->getStatusCode(),
-            output: $tester->getDisplay(true),
-            errorOutput: $tester->getErrorOutput(true),
-        );
+        try {
+            $tester->execute($input, ['decorated' => false, 'capture_stderr_separately' => true]);
+
+            return new CommandResult(
+                exitCode: $tester->getStatusCode(),
+                output: $tester->getDisplay(true),
+                errorOutput: $tester->getErrorOutput(true),
+            );
+        } catch (RuntimeException $e) {
+            $message = $e->getMessage() . "\n";
+
+            return new CommandResult(
+                exitCode: 1,
+                output: $message,
+                errorOutput: $message,
+            );
+        }
     }
 
     /**
