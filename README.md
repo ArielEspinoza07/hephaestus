@@ -2,7 +2,8 @@
 
 > Forge powerful CLI tools with ease
 
-A modern, type-safe wrapper around Symfony Console — write less boilerplate, get more type safety.
+An attribute-driven CLI framework built on Symfony Console.
+Define commands with PHP attributes — Hephaestus handles the rest.
 
 ---
 
@@ -17,6 +18,7 @@ Hephaestus gives you:
 - 🔧 Full Symfony power when needed
 - 🏗️ Clean architecture — SOLID, DRY, YAGNI, KISS
 - 🧪 Test-friendly design
+- 🚀 Built-in scaffolding — generate commands and entrypoints instantly
 
 ---
 
@@ -99,6 +101,96 @@ php bin/console app:greet John --yell
 
 php bin/console app:greet John -l
 # HELLO, JOHN!
+```
+
+---
+
+## Scaffolding
+
+Hephaestus ships a `bin/hephaestus` binary with two generators to get you started without writing boilerplate.
+
+### `make:command`
+
+Generate a command class skeleton inside your project's `src/Commands/` directory (auto-detected from `composer.json`).
+
+```bash
+./vendor/bin/hephaestus make:command Greet
+# → src/Commands/GreetCommand.php
+
+./vendor/bin/hephaestus make:command Greet --force   # overwrite existing
+./vendor/bin/hephaestus make:command Greet -f        # shortcut
+```
+
+The generated file:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Commands;
+
+use Hephaestus\Attributes\Description;
+use Hephaestus\Attributes\Output;
+use Hephaestus\Attributes\Signature;
+use Hephaestus\Console\Command;
+
+#[Signature('greet')]
+#[Description('')]
+#[Output]
+final readonly class GreetCommand extends Command
+{
+    public function execute(): int
+    {
+        return self::SUCCESS;
+    }
+}
+```
+
+The signature is auto-derived from the class name (`CreateUserCommand` → `create-user`) feel free to change it.
+
+---
+
+### `make:entrypoint`
+
+Generate an executable CLI entrypoint in `bin/`.
+
+```bash
+./vendor/bin/hephaestus make:entrypoint app
+# → bin/app  (executable, chmod 0755)
+
+# Full options
+./vendor/bin/hephaestus make:entrypoint app \
+    --app="My App" \
+    --ver=2.0.0 \
+    --dir=src/Commands \
+    --force
+```
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--app` | `ucfirst($name)` | App name passed to `CliApp::create()` |
+| `--ver` | `1.0.0` | App version |
+| `--dir` | auto-detected from `composer.json` | Relative path to commands directory |
+| `--force` / `-f` | `false` | Overwrite if file already exists |
+
+The generated file:
+
+```php
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use Hephaestus\CliApp;
+
+exit(
+    CliApp::create('App', '1.0.0')
+        ->registerCommands(__DIR__ . '/../src/Commands')
+        ->run()
+);
 ```
 
 ---
@@ -317,9 +409,11 @@ test('fails when name argument is missing', function () {
 
 ## Why "Hephaestus"?
 
-Hephaestus (Ἥφαιστος) — Greek god of craftsmen, metalworking, and forging.
+Hephaestus (Ἥφαιστος) is the Greek god of fire, metalworking, and the forge — the divine craftsman
+who built weapons and tools for gods and heroes alike.
 
-Just as Hephaestus forged legendary tools for the gods, this library helps you forge powerful CLI tools.
+This library follows the same principle: hand developers the right tools so they can forge great
+things without wasting time on the tedious parts.
 
 🔨 **Forge. Build. Ship.**
 
@@ -327,7 +421,25 @@ Just as Hephaestus forged legendary tools for the gods, this library helps you f
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome!
+
+### Development setup
+
+```bash
+git clone https://github.com/arielespinoza07/hephaestus
+cd hephaestus
+composer install
+```
+
+### Before submitting a PR
+
+```bash
+./vendor/bin/pint              # fix code style
+./vendor/bin/phpstan analyse   # static analysis
+./vendor/bin/pest              # run tests
+```
+
+Please open an issue or submit a Pull Request — all contributions are appreciated.
 
 ---
 
