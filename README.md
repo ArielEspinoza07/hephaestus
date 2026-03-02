@@ -1,6 +1,6 @@
 # Hephaestus
 
-> Forge powerful CLI tools with ease
+> Build powerful CLI tools with ease
 
 An attribute-driven CLI framework built on Symfony Console.
 Define commands with PHP attributes — Hephaestus handles the rest.
