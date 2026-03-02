@@ -53,7 +53,7 @@ test('returns OptionMetadata', function () {
 
     expect($parameter)->toBeInstanceOf(OptionMetadata::class)
         ->and($parameter->name)->toBeString()
-        ->and($parameter->name)->toBe('loud')
+        ->and($parameter->name)->toBe('yell')
         ->and($parameter->type)->toBeString()
         ->and($parameter->type)->toBe('bool')
         ->and($parameter->description)->toBeString()
