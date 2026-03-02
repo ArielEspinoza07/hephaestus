@@ -21,12 +21,12 @@ final readonly class CommandResult
 
     public function output(): string
     {
-        return str_replace("\r\n", "\n", $this->output);
+        return mb_trim(str_replace("\r\n", "\n", $this->output));
     }
 
     public function errorOutput(): string
     {
-        return str_replace("\r\n", "\n", $this->errorOutput);
+        return mb_trim(str_replace("\r\n", "\n", $this->errorOutput));
     }
 
     public function isSuccessful(): bool
@@ -34,7 +34,7 @@ final readonly class CommandResult
         return $this->exitCode === 0;
     }
 
-    public function assertSuccessful(): static
+    public function assertSuccessful(): self
     {
         Assert::assertSame(0, $this->exitCode, sprintf(
             'Expected exit code 0, got %d.',
@@ -44,14 +44,14 @@ final readonly class CommandResult
         return $this;
     }
 
-    public function assertFailed(): static
+    public function assertFailed(): self
     {
         Assert::assertNotSame(0, $this->exitCode, 'Expected command to fail, but it exited with code 0.');
 
         return $this;
     }
 
-    public function assertExitCode(int $expected): static
+    public function assertExitCode(int $expected): self
     {
         Assert::assertSame($expected, $this->exitCode, sprintf(
             'Expected exit code %d, got %d.',
@@ -62,7 +62,7 @@ final readonly class CommandResult
         return $this;
     }
 
-    public function assertOutputContains(string $needle): static
+    public function assertOutputContains(string $needle): self
     {
         Assert::assertStringContainsString($needle, $this->output(), sprintf(
             'Expected output to contain "%s".',
@@ -72,14 +72,14 @@ final readonly class CommandResult
         return $this;
     }
 
-    public function assertOutputEquals(string $expected): static
+    public function assertOutputEquals(string $expected): self
     {
-        Assert::assertSame($expected, $this->output(), 'Output does not match expected value.');
+        Assert::assertSame($expected, mb_trim($this->output()), 'Output does not match expected value.');
 
         return $this;
     }
 
-    public function assertErrorOutputContains(string $needle): static
+    public function assertErrorOutputContains(string $needle): self
     {
         Assert::assertStringContainsString($needle, $this->errorOutput(), sprintf(
             'Expected error output to contain "%s".',
