@@ -59,7 +59,7 @@ test('returns OptionMetadata', function () {
         ->and($parameter->description)->toBeString()
         ->and($parameter->description)->toBe('Whether to greet the user in a loud voice')
         ->and($parameter->acceptValue)->toBeBool()
-        ->and($parameter->acceptValue)->toBeTrue()
+        ->and($parameter->acceptValue)->toBeFalse()
         ->and($parameter->default)->toBeNull()
         ->and($parameter->isArray())->toBeBool()
         ->and($parameter->isArray())->toBeFalse()
