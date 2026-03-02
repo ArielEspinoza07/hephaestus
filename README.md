@@ -1,5 +1,11 @@
 # Hephaestus
 
+[![CI](https://github.com/arielespinoza07/hephaestus/actions/workflows/ci.yml/badge.svg)](https://github.com/arielespinoza07/hephaestus/actions/workflows/ci.yml)
+[![Latest Version](https://img.shields.io/packagist/v/arielespinoza07/hephaestus.svg)](https://packagist.org/packages/arielespinoza07/hephaestus)
+[![Total Downloads](https://img.shields.io/packagist/dt/arielespinoza07/hephaestus.svg)](https://packagist.org/packages/arielespinoza07/hephaestus)
+[![PHP Version](https://img.shields.io/packagist/php-v/arielespinoza07/hephaestus.svg)](https://packagist.org/packages/arielespinoza07/hephaestus)
+[![License](https://img.shields.io/packagist/l/arielespinoza07/hephaestus.svg)](LICENSE)
+
 > Build powerful CLI tools with ease
 
 An attribute-driven CLI framework built on Symfony Console.
