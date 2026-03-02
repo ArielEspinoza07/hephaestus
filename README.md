@@ -427,25 +427,7 @@ things without wasting time on the tedious parts.
 
 ## Contributing
 
-Contributions are welcome!
-
-### Development setup
-
-```bash
-git clone https://github.com/arielespinoza07/hephaestus
-cd hephaestus
-composer install
-```
-
-### Before submitting a PR
-
-```bash
-./vendor/bin/pint              # fix code style
-./vendor/bin/phpstan analyse   # static analysis
-./vendor/bin/pest              # run tests
-```
-
-Please open an issue or submit a Pull Request — all contributions are appreciated.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions, code conventions, and PR guidelines.
 
 ---
 
