@@ -224,15 +224,16 @@ MetadataReader  ──►  CommandMetadata
 
 ### Class-level attributes
 
-| Attribute | Required | Description |
-|-----------|----------|-------------|
-| `#[Signature('app:name')]` | ✅ | CLI command name |
-| `#[Description('...')]` | | Short description shown in the command list |
-| `#[Help('...')]` | | Extended help shown by `help <command>` |
+| Attribute                            | Required | Description |
+|--------------------------------------|----------|-------------|
+| `#[Signature('app:name')]`           | ✅ | CLI command name |
+| `#[Description('...')]`              | | Short description shown in the command list |
+| `#[Help('...')]`                     | | Extended help shown by `help <command>` |
 | `#[Usage(['app:name arg1', '...'])]` | | Example usages shown in help output |
-| `#[Alias('alias1\|alias2')]` | | Pipe-separated command aliases |
-| `#[Input]` | | Inject `InputInterface` into `$this->input` |
-| `#[Output]` | | Inject `OutputInterface` into `$this->output` |
+| `#[Alias('alias1\|alias2')]`         | | Pipe-separated command aliases |
+| `#[Input]`                           | | Inject `InputInterface` into `$this->input` |
+| `#[Output]`                          | | Inject `OutputInterface` into `$this->output` |
+| `#[Style]`                           | | Inject `SymfonyStyle ` into `$this->output` |
 
 ### Parameter-level attributes
 
