@@ -48,3 +48,13 @@ test('registerCommands without cache path does not throw', function () {
 
     expect(true)->toBeTrue();
 });
+
+test('registerCommands accepts multiple directories', function () {
+    $dir1 = realpath(__DIR__ . '/../Fixtures/CliApp/Multi1');
+    $dir2 = realpath(__DIR__ . '/../Fixtures/CliApp/Multi2');
+
+    $app = CliApp::create('test-app');
+    $result = $app->registerCommands([$dir1, $dir2]);
+
+    expect($result)->toBe($app);
+});

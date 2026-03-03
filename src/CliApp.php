@@ -27,14 +27,18 @@ final readonly class CliApp
     }
 
     /**
+     * @param string|list<string> $directories
      * @throws ReflectionException
      */
-    public function registerCommands(string $directory, ?string $cachePath = null): self
+    public function registerCommands(string|array $directories, ?string $cachePath = null): self
     {
         $loader = new CommandLoader(
             cache: $cachePath !== null ? new CommandCache($cachePath) : null,
         );
-        $this->app->addCommands($loader->load($directory));
+
+        foreach ((array) $directories as $directory) {
+            $this->app->addCommands($loader->load($directory));
+        }
 
         return $this;
     }
