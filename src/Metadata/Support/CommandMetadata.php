@@ -18,6 +18,7 @@ final readonly class CommandMetadata
         public ?string $help = null,
         public bool $hasInput = false,
         public bool $hasOutput = false,
+        public bool $hasStyleOutput = false,
         public array $usages = [],
         public array $aliases = [],
         public array $parameters = [],
