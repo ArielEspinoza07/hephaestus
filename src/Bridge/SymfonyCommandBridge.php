@@ -124,10 +124,12 @@ final readonly class SymfonyCommandBridge
         $inputs = [];
         foreach ($parameters as $parameter) {
             if ($parameter instanceof ArgumentMetadata) {
-                $inputs[] = $input->getArgument($parameter->name) ?? $parameter->default;
+                $raw = $input->getArgument($parameter->name) ?? $parameter->default;
+                $inputs[] = $this->castValue($raw, $parameter->type);
             }
             if ($parameter instanceof OptionMetadata) {
-                $inputs[] = $input->getOption($parameter->name) ?? $parameter->default;
+                $raw = $input->getOption($parameter->name) ?? $parameter->default;
+                $inputs[] = $this->castValue($raw, $parameter->type);
             }
             if ($parameter instanceof CompositeInputMetadata) {
                 $compositeInputs = $this->convertSymfonyInputsToInternals($input, $parameter->properties);
@@ -136,5 +138,19 @@ final readonly class SymfonyCommandBridge
         }
 
         return $inputs;
+    }
+
+    private function castValue(mixed $value, string $type): mixed
+    {
+        if ($value === null || is_array($value)) {
+            return $value;
+        }
+
+        return match ($type) {
+            'int' => (int) $value,
+            'float' => (float) $value,
+            'bool' => is_bool($value) ? $value : filter_var($value, FILTER_VALIDATE_BOOLEAN),
+            default => $value,
+        };
     }
 }
