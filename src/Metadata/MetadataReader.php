@@ -12,6 +12,7 @@ use Hephaestus\Metadata\Resolver\InputAttributeResolver;
 use Hephaestus\Metadata\Resolver\MethodParametersResolver;
 use Hephaestus\Metadata\Resolver\OutputAttributeResolver;
 use Hephaestus\Metadata\Resolver\SignatureAttributeResolver;
+use Hephaestus\Metadata\Resolver\StyleAttributeResolver;
 use Hephaestus\Metadata\Resolver\UsageAttributeResolver;
 use Hephaestus\Metadata\Support\InputMetadataContract;
 use Hephaestus\Metadata\Support\CommandMetadata;
@@ -62,6 +63,11 @@ final readonly class MetadataReader
     private OutputAttributeResolver $outputResolver;
 
     /**
+     * @var StyleAttributeResolver<T> $styleResolver
+     */
+    private StyleAttributeResolver $styleResolver;
+
+    /**
      * @var MethodParametersResolver<T> $methodParametersResolver
      */
     private MethodParametersResolver $methodParametersResolver;
@@ -77,6 +83,7 @@ final readonly class MetadataReader
         $this->aliasResolver = new AliasAttributeResolver($attributeExtractor);
         $this->inputResolver = new InputAttributeResolver($attributeExtractor);
         $this->outputResolver = new OutputAttributeResolver($attributeExtractor);
+        $this->styleResolver = new StyleAttributeResolver($attributeExtractor);
         $this->methodParametersResolver = new MethodParametersResolver();
     }
 
@@ -94,13 +101,20 @@ final readonly class MetadataReader
 
         $parameters = $this->getMethodParameters($reflectionClass);
 
+        $hasOutput = $this->outputResolver->resolve($reflectionClass);
+        $hasOutputStyle = $this->styleResolver->resolve($reflectionClass);
+        if ($hasOutput && $hasOutputStyle) {
+            $hasOutput = false;
+        }
+
         return new CommandMetadata(
             target: $className,
             signature: $this->signatureResolver->resolve($reflectionClass),
             description: $this->descriptionResolver->resolve($reflectionClass),
             help: $this->helpResolver->resolve($reflectionClass),
             hasInput: count($parameters) > 0 ? false : $this->inputResolver->resolve($reflectionClass),
-            hasOutput: $this->outputResolver->resolve($reflectionClass),
+            hasOutput: $hasOutput,
+            hasStyleOutput: $hasOutputStyle,
             usages: $this->usageResolver->resolve($reflectionClass),
             aliases: $this->aliasResolver->resolve($reflectionClass),
             parameters: $parameters,
