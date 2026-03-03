@@ -11,12 +11,16 @@ use Hephaestus\Metadata\Support\CommandMetadata;
 use ReflectionClass;
 use ReflectionException;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Finder\Finder;
 
 final readonly class CommandLoader
 {
+    private Finder $finder;
     public function __construct(
         private ?CommandCache $cache = null,
-    ) {}
+    ) {
+        $this->finder = Finder::create();
+    }
 
     /**
      * @return list<Command>
@@ -28,14 +32,17 @@ final readonly class CommandLoader
         $reader = new MetadataReader();
         $bridge = new SymfonyCommandBridge();
 
-        $files = glob(mb_rtrim($directory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . '*.php') ?: [];
+        $files = $this->finder
+            ->files()
+            ->in(mb_rtrim($directory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR)
+            ->name('*Command.php');
 
         $commands = [];
 
         foreach ($files as $file) {
-            $className = $this->resolveClassName($file);
+            $className = $this->resolveClassName($file->getRealPath());
             if ($className !== null) {
-                $commands[] = $this->readMetadata($reader, $file, $className);
+                $commands[] = $this->readMetadata($reader, $file->getRealPath(), $className);
             }
         }
 
