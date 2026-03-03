@@ -15,12 +15,9 @@ use Symfony\Component\Finder\Finder;
 
 final readonly class CommandLoader
 {
-    private Finder $finder;
     public function __construct(
         private ?CommandCache $cache = null,
-    ) {
-        $this->finder = Finder::create();
-    }
+    ) {}
 
     /**
      * @return list<Command>
@@ -31,8 +28,9 @@ final readonly class CommandLoader
     {
         $reader = new MetadataReader();
         $bridge = new SymfonyCommandBridge();
+        $finder = new Finder();
 
-        $files = $this->finder
+        $files = $finder
             ->files()
             ->in(mb_rtrim($directory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR)
             ->name('*Command.php');
