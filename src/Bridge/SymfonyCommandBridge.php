@@ -14,6 +14,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 final readonly class SymfonyCommandBridge
 {
@@ -55,6 +56,10 @@ final readonly class SymfonyCommandBridge
             if ($metadata->hasOutput) {
                 $class = $class->withOutput($output);
             }
+            if ($metadata->hasStyleOutput) {
+                $class = $class->withOutput(new SymfonyStyle($input, $output));
+            }
+
             $parameters = $this->convertSymfonyInputsToInternals($input, $metadata->parameters);
 
             return $class->execute(...$parameters);
