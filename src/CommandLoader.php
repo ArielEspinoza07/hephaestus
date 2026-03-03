@@ -8,7 +8,6 @@ use Hephaestus\Bridge\SymfonyCommandBridge;
 use Hephaestus\Cache\CommandCache;
 use Hephaestus\Metadata\MetadataReader;
 use Hephaestus\Metadata\Support\CommandMetadata;
-use ReflectionClass;
 use ReflectionException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Finder\Finder;
@@ -21,7 +20,6 @@ final readonly class CommandLoader
 
     /**
      * @return list<Command>
-     *
      * @throws ReflectionException
      */
     public function load(string $directory): array
@@ -40,6 +38,7 @@ final readonly class CommandLoader
         foreach ($files as $file) {
             $className = $this->resolveClassName($file->getRealPath());
             if ($className !== null) {
+                require_once $file->getRealPath();
                 $commands[] = $this->readMetadata($reader, $file->getRealPath(), $className);
             }
         }
@@ -58,7 +57,6 @@ final readonly class CommandLoader
     /**
      * @param MetadataReader<object> $reader
      * @param class-string $className
-     *
      * @throws ReflectionException
      */
     private function readMetadata(MetadataReader $reader, string $file, string $className): CommandMetadata
@@ -78,19 +76,39 @@ final readonly class CommandLoader
 
     private function resolveClassName(string $file): ?string
     {
-        $before = get_declared_classes();
-        require_once $file;
-        $after = get_declared_classes();
+        $tokens = token_get_all((string) file_get_contents($file), TOKEN_PARSE);
 
-        $realFile = realpath($file);
+        $namespace = '';
+        $count = count($tokens);
 
-        foreach (array_diff($after, $before) as $class) {
-            try {
-                if (realpath(new ReflectionClass($class)->getFileName()) === $realFile) {
-                    return $class;
+        for ($i = 0; $i < $count; $i++) {
+            $token = $tokens[$i];
+
+            if (!is_array($token)) {
+                continue;
+            }
+
+            if ($token[0] === T_NAMESPACE) {
+                $i += 2; // skip T_NAMESPACE + whitespace
+                $namespace = '';
+                while ($i < $count && $tokens[$i] !== ';' && $tokens[$i] !== '{') {
+                    if (is_array($tokens[$i])) {
+                        $namespace .= $tokens[$i][1];
+                    }
+                    $i++;
                 }
-            } catch (ReflectionException) {
-                // skip internal or anonymous classes without a file
+                continue;
+            }
+
+            if ($token[0] === T_CLASS) {
+                $j = $i + 1;
+                while ($j < $count && is_array($tokens[$j]) && $tokens[$j][0] === T_WHITESPACE) {
+                    $j++;
+                }
+                if (is_array($tokens[$j]) && $tokens[$j][0] === T_STRING) {
+                    $class = $tokens[$j][1];
+                    return $namespace !== '' ? $namespace . '\\' . $class : $class;
+                }
             }
         }
 
