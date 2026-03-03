@@ -32,6 +32,7 @@ Hephaestus gives you:
 
 - PHP 8.5+
 - Symfony Console 8.0+
+- psr/container 2.0+  (pulled in automatically via Composer)
 
 ---
 
@@ -250,6 +251,8 @@ Maps a positional CLI argument (`command arg`).
 string $name
 ```
 
+> **Type casting**: When the parameter type is `int`, `float`, or `bool`, the raw CLI string is automatically cast before being passed to `execute()`.
+
 #### `#[Option]`
 
 Maps a named CLI option (`command --option` or `command --option=value`).
@@ -263,6 +266,8 @@ Maps a named CLI option (`command --option` or `command --option=value`).
 )]
 bool $yell
 ```
+
+> **Type casting**: When the parameter type is `int`, `float`, or `bool`, the raw CLI string is automatically cast before being passed to `execute()`.
 
 #### `#[CompositeInput]`
 
@@ -324,17 +329,26 @@ CliApp::create(string $name, string $version = '1.0.0'): self
 ```
 
 ```php
-// Scan a directory and register all commands
-->registerCommands(string $directory, ?string $cachePath = null): self
+// Scan one or multiple directories and register all commands
+->registerCommands(string|array $directories, ?string $cachePath = null): self
 
-// Write parsed metadata to a cache file for faster startup
+// Examples
+->registerCommands(__DIR__ . '/src/Commands')
+->registerCommands([__DIR__ . '/src/Commands', __DIR__ . '/src/Plugins'])
+
+// With metadata cache for faster startup
 ->registerCommands(__DIR__ . '/src/Commands', __DIR__ . '/var/cache/commands.cache')
+
+// Resolve commands through a PSR-11 container (optional)
+->withContainer(ContainerInterface $container): self
 
 // Run the CLI application
 ->run(): int
 ```
 
 `registerCommands()` returns `$this` for fluent chaining and can be called multiple times for multiple directories.
+
+`withContainer()` enables dependency injection — commands are resolved via `$container->get()` instead of `new ClassName()`.
 
 ---
 
