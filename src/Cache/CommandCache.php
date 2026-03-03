@@ -8,6 +8,7 @@ use Hephaestus\Metadata\Support\ArgumentMetadata;
 use Hephaestus\Metadata\Support\CommandMetadata;
 use Hephaestus\Metadata\Support\CompositeInputMetadata;
 use Hephaestus\Metadata\Support\OptionMetadata;
+use RuntimeException;
 
 final class CommandCache
 {
@@ -41,8 +42,13 @@ final class CommandCache
 
     public function set(string $file, CommandMetadata $metadata): void
     {
+        $hash = hash_file('xxh3', $file);
+        if ($hash === false) {
+            throw new RuntimeException(sprintf('Failed to hash file: %s', $file));
+        }
+
         $this->data[$file] = [
-            'hash'     => hash_file('xxh3', $file),
+            'hash'     => $hash,
             'metadata' => $metadata,
         ];
         $this->dirty = true;

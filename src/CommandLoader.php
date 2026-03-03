@@ -41,6 +41,7 @@ final readonly class CommandLoader
             $className = $this->resolveClassName($file->getRealPath());
             if ($className !== null) {
                 require_once $file->getRealPath();
+                /** @var class-string $className */
                 $commands[] = $this->readMetadata($reader, $file->getRealPath(), $className);
             }
         }

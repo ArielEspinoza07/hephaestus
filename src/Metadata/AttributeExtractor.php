@@ -13,9 +13,10 @@ use ReflectionClass;
 final class AttributeExtractor
 {
     /**
+     * @template TAttr of object
      * @param ReflectionClass<T> $class
-     * @param class-string<T> $attributeClass
-     * @return ReflectionAttribute<T>|null
+     * @param class-string<TAttr> $attributeClass
+     * @return ReflectionAttribute<TAttr>|null
      */
     public function extract(ReflectionClass $class, string $attributeClass): ?ReflectionAttribute
     {

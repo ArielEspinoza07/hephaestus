@@ -40,9 +40,12 @@ final readonly class CompositeInputAttributeResolver
         /** @var ReflectionNamedType $parameterType */
         $parameterType = $parameter->getType();
 
+        /** @var class-string $target */
+        $target = $parameterType->getName();
+
         return new CompositeInputMetadata(
-            target: $parameterType->getName(),
-            properties: $this->getProperties($parameterType->getName()),
+            target: $target,
+            properties: $this->getProperties($target),
         );
     }
 
@@ -67,6 +70,7 @@ final readonly class CompositeInputAttributeResolver
 
             /** @var ReflectionNamedType $parameterType */
             $parameterType = $parameter->getType();
+            /** @var ReflectionAttribute<object> $attribute */
             $attribute = array_first($parameter->getAttributes());
             $this->checkIfParameterTypeIsAllowedByAttribute($parameter, $parameterType, $attribute);
             $parameters[] = match ($attribute->getName()) {
@@ -85,7 +89,7 @@ final readonly class CompositeInputAttributeResolver
     }
 
     /**
-     * @param ReflectionAttribute<T> $attribute
+     * @param ReflectionAttribute<object> $attribute
      */
     private function checkIfParameterTypeIsAllowedByAttribute(
         ReflectionParameter $parameter,
@@ -97,7 +101,7 @@ final readonly class CompositeInputAttributeResolver
                 message: sprintf(
                     'Incorrect type declaration on parameter %s in class %s.',
                     $parameter->getName(),
-                    $parameter->getDeclaringClass()->getName(),
+                    $parameter->getDeclaringClass()?->getName() ?? 'unknown',
                 ),
             );
         }
@@ -106,7 +110,7 @@ final readonly class CompositeInputAttributeResolver
                 message: sprintf(
                     'Incorrect type declaration on parameter %s in class %s.',
                     $parameter->getName(),
-                    $parameter->getDeclaringClass()->getName(),
+                    $parameter->getDeclaringClass()?->getName() ?? 'unknown',
                 ),
             );
         }

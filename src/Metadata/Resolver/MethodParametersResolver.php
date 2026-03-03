@@ -61,6 +61,7 @@ final readonly class MethodParametersResolver
 
             /** @var ReflectionNamedType $parameterType */
             $parameterType = $parameter->getType();
+            /** @var ReflectionAttribute<object> $attribute */
             $attribute = array_first($parameter->getAttributes());
             $this->checkIfParameterTypeIsAllowedByAttribute($parameter, $parameterType, $attribute);
             $parameters[] = match ($attribute->getName()) {
@@ -80,7 +81,7 @@ final readonly class MethodParametersResolver
     }
 
     /**
-     * @param ReflectionAttribute<T> $attribute
+     * @param ReflectionAttribute<object> $attribute
      */
     private function checkIfParameterTypeIsAllowedByAttribute(
         ReflectionParameter $parameter,
@@ -92,7 +93,7 @@ final readonly class MethodParametersResolver
                 message: sprintf(
                     'Incorrect type declaration on parameter %s in class %s.',
                     $parameter->getName(),
-                    $parameter->getDeclaringClass()->getName(),
+                    $parameter->getDeclaringClass()?->getName() ?? 'unknown',
                 ),
             );
         }
@@ -101,7 +102,7 @@ final readonly class MethodParametersResolver
                 message: sprintf(
                     'Incorrect type declaration on parameter %s in class %s.',
                     $parameter->getName(),
-                    $parameter->getDeclaringClass()->getName(),
+                    $parameter->getDeclaringClass()?->getName() ?? 'unknown',
                 ),
             );
         }
@@ -110,7 +111,7 @@ final readonly class MethodParametersResolver
                 message: sprintf(
                     'Incorrect type declaration on parameter %s in class %s.',
                     $parameter->getName(),
-                    $parameter->getDeclaringClass()->getName(),
+                    $parameter->getDeclaringClass()?->getName() ?? 'unknown',
                 ),
             );
         }

@@ -18,7 +18,7 @@ trait HasParameter
                 message: sprintf(
                     'Missing type declaration on property %s in class %s.',
                     $parameter->getName(),
-                    $parameter->getDeclaringClass()->getName(),
+                    $parameter->getDeclaringClass()?->getName() ?? 'unknown',
                 ),
             );
         }
@@ -29,7 +29,7 @@ trait HasParameter
                 message: sprintf(
                     'Union and intersection types are not supported on property %s in class %s.',
                     $parameter->getName(),
-                    $parameter->getDeclaringClass()->getName(),
+                    $parameter->getDeclaringClass()?->getName() ?? 'unknown',
                 ),
             );
         }
@@ -42,7 +42,7 @@ trait HasParameter
                 message: sprintf(
                     'Only one attribute is allowed on property %s in class %s.',
                     $parameter->getName(),
-                    $parameter->getDeclaringClass()->getName()
+                    $parameter->getDeclaringClass()?->getName() ?? 'unknown'
                 )
             );
         }
