@@ -8,6 +8,7 @@ use Hephaestus\Bridge\SymfonyCommandBridge;
 use Hephaestus\Cache\CommandCache;
 use Hephaestus\Metadata\MetadataReader;
 use Hephaestus\Metadata\Support\CommandMetadata;
+use Psr\Container\ContainerInterface;
 use ReflectionException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Finder\Finder;
@@ -16,6 +17,7 @@ final readonly class CommandLoader
 {
     public function __construct(
         private ?CommandCache $cache = null,
+        private ?ContainerInterface $container = null,
     ) {}
 
     /**
@@ -25,7 +27,7 @@ final readonly class CommandLoader
     public function load(string $directory): array
     {
         $reader = new MetadataReader();
-        $bridge = new SymfonyCommandBridge();
+        $bridge = new SymfonyCommandBridge($this->container);
         $finder = new Finder();
 
         $files = $finder

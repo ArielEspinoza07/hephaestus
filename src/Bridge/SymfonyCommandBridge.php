@@ -9,6 +9,7 @@ use Hephaestus\Metadata\Support\CommandMetadata;
 use Hephaestus\Metadata\Support\CompositeInputMetadata;
 use Hephaestus\Metadata\Support\InputMetadataContract;
 use Hephaestus\Metadata\Support\OptionMetadata;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -18,7 +19,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 final readonly class SymfonyCommandBridge
 {
-    public function __construct() {}
+    public function __construct(private ?ContainerInterface $container = null) {}
 
     public function convert(CommandMetadata $metadata): Command
     {
@@ -49,7 +50,9 @@ final readonly class SymfonyCommandBridge
         }
 
         $symfonyCommand->setCode(function (InputInterface $input, OutputInterface $output) use ($metadata) {
-            $class = new $metadata->target();
+            $class = $this->container !== null
+                ? $this->container->get($metadata->target)
+                : new $metadata->target();
             if ($metadata->hasInput) {
                 $class = $class->withInput($input);
             }

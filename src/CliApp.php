@@ -6,12 +6,15 @@ namespace Hephaestus;
 
 use Exception;
 use Hephaestus\Cache\CommandCache;
+use Psr\Container\ContainerInterface;
 use ReflectionException;
 use Symfony\Component\Console\Application;
 
-final readonly class CliApp
+final class CliApp
 {
     private Application $app;
+
+    private ?ContainerInterface $container = null;
 
     private function __construct(private string $name, private string $version)
     {
@@ -26,6 +29,13 @@ final readonly class CliApp
         );
     }
 
+    public function withContainer(ContainerInterface $container): self
+    {
+        $this->container = $container;
+
+        return $this;
+    }
+
     /**
      * @param string|list<string> $directories
      * @throws ReflectionException
@@ -34,6 +44,7 @@ final readonly class CliApp
     {
         $loader = new CommandLoader(
             cache: $cachePath !== null ? new CommandCache($cachePath) : null,
+            container: $this->container,
         );
 
         foreach ((array) $directories as $directory) {
@@ -50,6 +61,4 @@ final readonly class CliApp
     {
         return $this->app->run();
     }
-
-
 }
