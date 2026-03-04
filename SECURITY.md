@@ -14,7 +14,7 @@ Only the latest minor release of the current major version receives security fix
 
 If you discover a security vulnerability in Hephaestus, please disclose it responsibly by emailing:
 
-**ariel@aurora-php.dev**
+**arielespinoza46@gmail.com**
 
 Include as much of the following as possible:
 
