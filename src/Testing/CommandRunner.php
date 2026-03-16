@@ -8,8 +8,8 @@ use Hephaestus\Bridge\SymfonyCommandBridge;
 use Hephaestus\Console\Command;
 use Hephaestus\Metadata\MetadataReader;
 use ReflectionException;
-use RuntimeException;
 use Symfony\Component\Console\Tester\CommandTester;
+use Throwable;
 
 final class CommandRunner
 {
@@ -76,7 +76,7 @@ final class CommandRunner
                 output: $tester->getDisplay(true),
                 errorOutput: $tester->getErrorOutput(true),
             );
-        } catch (RuntimeException $e) {
+        } catch (Throwable $e) {
             $message = $e->getMessage() . "\n";
 
             return new CommandResult(

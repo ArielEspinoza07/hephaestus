@@ -53,14 +53,18 @@ final readonly class SymfonyCommandBridge
             $class = $this->container !== null
                 ? $this->container->get($metadata->target)
                 : new $metadata->target();
+
             if ($metadata->hasInput) {
                 $class = $class->withInput($input);
             }
-            if ($metadata->hasOutput) {
-                $class = $class->withOutput($output);
-            }
-            if ($metadata->hasStyleOutput) {
-                $class = $class->withOutput(new SymfonyStyle($input, $output));
+
+            $commandOutput = match(true) {
+                $metadata->hasStyleOutput => new SymfonyStyle($input, $output),
+                $metadata->hasOutput => $output,
+                default => null,
+            };
+            if ($commandOutput) {
+                $class = $class->withOutput($commandOutput);
             }
 
             $parameters = $this->convertSymfonyInputsToInternals($input, $metadata->parameters);
