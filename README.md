@@ -19,7 +19,7 @@ Define commands with PHP attributes — Hephaestus handles the rest.
 
 Hephaestus gives you:
 - 🎯 Simple API for simple tasks
-- 🔒 Type-safe everywhere (PHP 8.5+)
+- 🔒 Type-safe everywhere (PHP 8.3+)
 - ⚡ Fast to write, easy to test
 - 🔧 Full Symfony power when needed
 - 🏗️ Clean architecture — SOLID, DRY, YAGNI, KISS
@@ -30,8 +30,8 @@ Hephaestus gives you:
 
 ## Requirements
 
-- PHP 8.5+
-- Symfony Console 8.0+
+- PHP 8.3+
+- Symfony Console 7.4+ or 8.0+
 - psr/container 2.0+  (pulled in automatically via Composer)
 
 ---
@@ -72,7 +72,7 @@ final readonly class GreetCommand extends Command
         bool $yell = false,
     ): int {
         $greeting = sprintf('Hello, %s!', $name);
-        $this->output->writeln($yell ? mb_strtoupper($greeting) : $greeting);
+        $this->output->writeln($yell ? strtoupper($greeting) : $greeting);
 
         return self::SUCCESS;
     }
