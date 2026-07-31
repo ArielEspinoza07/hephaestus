@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.0] - 2026-07-31
+
+### Added
+
+- `ConsoleIO` — mutable holder for `InputInterface`/`OutputInterface`, referenced by `Command` via a new `protected ConsoleIO $consoleIO` property
+
+### Changed
+
+- **Breaking:** `Command::__construct()` now accepts `?ConsoleIO $consoleIO = null` instead of `?InputInterface $input = null, ?OutputInterface $output = null`; code that manually instantiates a `Command` subclass with positional or named `input`/`output` arguments must pass a `ConsoleIO` instance instead
+- `#[Input]`/`#[Output]`/`#[Style]` now inject into `$this->consoleIO->input` / `$this->consoleIO->output` instead of `$this->input` / `$this->output`
+
+### Fixed
+
+- `HasInput::withInput()` and `HasOutput::withOutput()` no longer reconstruct the command via `new static(input: ..., output: ...)`, which assumed every command constructor matched the base `Command` signature exactly and broke (or silently discarded resolved dependencies) for commands with their own constructor-injected dependencies; they now mutate `$consoleIO` in place and return the same instance
+
 ## [2.0.1] - 2026-07-30
 
 ### Changed
@@ -95,7 +110,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Laravel Pint PSR-12 code style enforcement
 - MIT license
 
-[Unreleased]: https://github.com/arielespinoza07/hephaestus/compare/v2.0.1...HEAD
+[Unreleased]: https://github.com/arielespinoza07/hephaestus/compare/v3.0.0...HEAD
+[3.0.0]: https://github.com/arielespinoza07/hephaestus/compare/v2.0.1...v3.0.0
 [2.0.1]: https://github.com/arielespinoza07/hephaestus/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/arielespinoza07/hephaestus/compare/v1.1.1...v2.0.0
 [1.1.1]: https://github.com/arielespinoza07/hephaestus/compare/v1.1.0...v1.1.1
