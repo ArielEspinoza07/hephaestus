@@ -18,7 +18,6 @@ use Hephaestus\Metadata\Support\InputMetadataContract;
 use Hephaestus\Metadata\Support\CommandMetadata;
 use ReflectionClass;
 use ReflectionException;
-use ReflectionMethod;
 use RuntimeException;
 
 /**
@@ -126,7 +125,7 @@ final readonly class MetadataReader
      */
     private function checkParentClass(ReflectionClass $class): void
     {
-        if ($class->getParentClass() === false || $class->getParentClass()->getName() !== Command::class) {
+        if (! $class->isSubclassOf(Command::class)) {
             throw new RuntimeException(
                 message: sprintf(
                     'Command class "%s" must extend "%s"',
@@ -142,14 +141,21 @@ final readonly class MetadataReader
      */
     private function checkExecuteMethod(ReflectionClass $class): void
     {
-        $method = array_find(
-            array: $class->getMethods(),
-            callback: fn (ReflectionMethod $method) => $method->getName() === self::DEFAULT_COMMAND_METHOD,
-        );
-        if ($method === null) {
+        if (!$class->hasMethod(self::DEFAULT_COMMAND_METHOD)) {
             throw new RuntimeException(
                 message: sprintf(
                     'Command class "%s" must have an "%s" method',
+                    $class->getName(),
+                    self::DEFAULT_COMMAND_METHOD,
+                ),
+            );
+        }
+
+        $method = $class->getMethod(self::DEFAULT_COMMAND_METHOD);
+        if (!$method->isPublic()) {
+            throw new RuntimeException(
+                message: sprintf(
+                    'The "%s::%s" method must be public',
                     $class->getName(),
                     self::DEFAULT_COMMAND_METHOD,
                 ),
