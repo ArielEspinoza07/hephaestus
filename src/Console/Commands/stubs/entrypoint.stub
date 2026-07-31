@@ -9,6 +9,6 @@ use Hephaestus\CliApp;
 
 exit(
     CliApp::create('{{ appName }}', '{{ version }}')
-        ->registerCommands(__DIR__ . '/../{{ commandsDir }}')
+        ->registerCommandsDirectory(__DIR__ . '/../{{ commandsDir }}')
         ->run()
 );

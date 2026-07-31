@@ -6,6 +6,7 @@ namespace Hephaestus;
 
 use Exception;
 use Hephaestus\Cache\CommandCache;
+use Hephaestus\Console\Command;
 use Psr\Container\ContainerInterface;
 use ReflectionException;
 use Symfony\Component\Console\Application;
@@ -15,6 +16,8 @@ final class CliApp
     private Application $app;
 
     private ?ContainerInterface $container = null;
+
+    private ?string $cachePath = null;
 
     private function __construct(private string $name, private string $version)
     {
@@ -36,20 +39,44 @@ final class CliApp
         return $this;
     }
 
+    public function withCache(string $cachePath): self
+    {
+        $this->cachePath = $cachePath;
+
+        return $this;
+    }
+
     /**
      * @param string|list<string> $directories
      * @throws ReflectionException
      */
-    public function registerCommands(string|array $directories, ?string $cachePath = null): self
+    public function registerCommandsDirectory(string|array $directories): self
     {
-        $loader = new CommandLoader(
-            cache: $cachePath !== null ? new CommandCache($cachePath) : null,
-            container: $this->container,
-        );
+        $loader = $this->loader();
 
         foreach ((array) $directories as $directory) {
-            $this->app->addCommands($loader->load($directory));
+            $this->app->addCommands($loader->loadDirectory($directory));
         }
+
+        return $this;
+    }
+
+    /**
+     * @param class-string<Command> $command
+     * @throws ReflectionException
+     */
+    public function registerCommand(string $command): self
+    {
+        return $this->registerCommands([$command]);
+    }
+
+    /**
+     * @param list<class-string<Command>> $commands
+     * @throws ReflectionException
+     */
+    public function registerCommands(array $commands): self
+    {
+        $this->app->addCommands($this->loader()->loadClasses($commands));
 
         return $this;
     }
@@ -60,5 +87,13 @@ final class CliApp
     public function run(): int
     {
         return $this->app->run();
+    }
+
+    private function loader(): CommandLoader
+    {
+        return new CommandLoader(
+            cache: $this->cachePath !== null ? new CommandCache($this->cachePath) : null,
+            container: $this->container,
+        );
     }
 }

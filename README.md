@@ -92,7 +92,7 @@ use Hephaestus\CliApp;
 
 exit(
     CliApp::create('MyApp', '1.0.0')
-        ->registerCommands(__DIR__ . '/src/Commands')
+        ->registerCommandsDirectory(__DIR__ . '/src/Commands')
         ->run()
 );
 ```
@@ -195,7 +195,7 @@ use Hephaestus\CliApp;
 
 exit(
     CliApp::create('App', '1.0.0')
-        ->registerCommands(__DIR__ . '/../src/Commands')
+        ->registerCommandsDirectory(__DIR__ . '/../src/Commands')
         ->run()
 );
 ```
@@ -330,14 +330,18 @@ CliApp::create(string $name, string $version = '1.0.0'): self
 
 ```php
 // Scan one or multiple directories and register all commands
-->registerCommands(string|array $directories, ?string $cachePath = null): self
+->registerCommandsDirectory(string|array $directories): self
 
 // Examples
-->registerCommands(__DIR__ . '/src/Commands')
-->registerCommands([__DIR__ . '/src/Commands', __DIR__ . '/src/Plugins'])
+->registerCommandsDirectory(__DIR__ . '/src/Commands')
+->registerCommandsDirectory([__DIR__ . '/src/Commands', __DIR__ . '/src/Plugins'])
+
+// Register commands explicitly by class name
+->registerCommand(string $command): self
+->registerCommands(array $commands): self
 
 // With metadata cache for faster startup
-->registerCommands(__DIR__ . '/src/Commands', __DIR__ . '/var/cache/commands.cache')
+->withCache(string $cachePath): self
 
 // Resolve commands through a PSR-11 container (optional)
 ->withContainer(ContainerInterface $container): self
@@ -346,7 +350,11 @@ CliApp::create(string $name, string $version = '1.0.0'): self
 ->run(): int
 ```
 
-`registerCommands()` returns `$this` for fluent chaining and can be called multiple times for multiple directories.
+`registerCommandsDirectory()` returns `$this` for fluent chaining and can be called multiple times for multiple directories.
+
+`registerCommand()` / `registerCommands()` register commands by class name directly, without scanning a directory.
+
+`withCache(string $cachePath)` caches discovered command metadata to a single file, keyed and invalidated per source file by content hash, so unchanged commands skip re-reflection on the next run. Applies to `registerCommandsDirectory()`, `registerCommand()`, and `registerCommands()` alike. Call it before those — it only applies to calls made after it.
 
 `withContainer()` enables dependency injection — commands are resolved via `$container->get()` instead of `new ClassName()`.
 

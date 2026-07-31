@@ -9,30 +9,36 @@ use Hephaestus\Cache\CommandCache;
 use Hephaestus\Metadata\MetadataReader;
 use Hephaestus\Metadata\Support\CommandMetadata;
 use Psr\Container\ContainerInterface;
+use ReflectionClass;
 use ReflectionException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Finder\Finder;
 
 final readonly class CommandLoader
 {
+    /** @var MetadataReader<object> */
+    private MetadataReader $reader;
+    private SymfonyCommandBridge $bridge;
+
     public function __construct(
         private ?CommandCache $cache = null,
         private ?ContainerInterface $container = null,
-    ) {}
+    ) {
+        $this->reader = new MetadataReader();
+        $this->bridge = new SymfonyCommandBridge($this->container);
+    }
 
     /**
      * @return list<Command>
      * @throws ReflectionException
      */
-    public function load(string $directory): array
+    public function loadDirectory(string $directory): array
     {
-        $reader = new MetadataReader();
-        $bridge = new SymfonyCommandBridge($this->container);
         $finder = new Finder();
 
         $files = $finder
             ->files()
-            ->in(mb_rtrim($directory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR)
+            ->in(rtrim($directory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR)
             ->name('*Command.php');
 
         $commands = [];
@@ -42,27 +48,54 @@ final readonly class CommandLoader
             if ($className !== null) {
                 require_once $file->getRealPath();
                 /** @var class-string $className */
-                $commands[] = $this->readMetadata($reader, $file->getRealPath(), $className);
+                $commands[] = $this->readMetadata($file->getRealPath(), $className);
             }
         }
 
+        return $this->convert($commands);
+    }
+
+    /**
+     * @param list<class-string> $classNames
+     * @return list<Command>
+     * @throws ReflectionException
+     */
+    public function loadClasses(array $classNames): array
+    {
+        $commands = [];
+
+        foreach ($classNames as $className) {
+            $file = (new ReflectionClass($className))->getFileName();
+            $commands[] = $file !== false
+                ? $this->readMetadata($file, $className)
+                : $this->reader->read($className);
+        }
+
+        return $this->convert($commands);
+    }
+
+    /**
+     * @param list<CommandMetadata> $metadata
+     * @return list<Command>
+     */
+    private function convert(array $metadata): array
+    {
         $this->cache?->flush();
 
         $symfonyCommands = [];
 
-        foreach ($commands as $metadata) {
-            $symfonyCommands[] = $bridge->convert($metadata);
+        foreach ($metadata as $item) {
+            $symfonyCommands[] = $this->bridge->convert($item);
         }
 
         return $symfonyCommands;
     }
 
     /**
-     * @param MetadataReader<object> $reader
      * @param class-string $className
      * @throws ReflectionException
      */
-    private function readMetadata(MetadataReader $reader, string $file, string $className): CommandMetadata
+    private function readMetadata(string $file, string $className): CommandMetadata
     {
         if ($this->cache !== null) {
             $cached = $this->cache->get($file);
@@ -71,7 +104,7 @@ final readonly class CommandLoader
             }
         }
 
-        $metadata = $reader->read($className);
+        $metadata = $this->reader->read($className);
         $this->cache?->set($file, $metadata);
 
         return $metadata;

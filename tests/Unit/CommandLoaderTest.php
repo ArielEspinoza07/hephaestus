@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Hephaestus\Cache\CommandCache;
 use Hephaestus\CommandLoader;
 use Hephaestus\Metadata\Support\CommandMetadata;
+use Hephaestus\Tests\Fixtures\CliApp\CliAppTestCommand;
 use Symfony\Component\Console\Command\Command;
 
 function loaderCacheFile(): string
@@ -22,7 +23,7 @@ test('load returns Symfony commands without cache', function () {
     $loader = new CommandLoader();
     $dir = realpath(__DIR__ . '/../Fixtures/LoaderCommands/NoCache');
 
-    $commands = $loader->load($dir);
+    $commands = $loader->loadDirectory($dir);
 
     expect($commands)->toHaveCount(1)
         ->and($commands[0])->toBeInstanceOf(Command::class)
@@ -35,7 +36,7 @@ test('load with cache writes cache file and returns commands', function () {
     $loader = new CommandLoader($cache);
     $dir = realpath(__DIR__ . '/../Fixtures/LoaderCommands/WithCache');
 
-    $commands = $loader->load($dir);
+    $commands = $loader->loadDirectory($dir);
 
     expect($commands)->toHaveCount(1)
         ->and($commands[0]->getName())->toBe('app:with-cache')
@@ -66,7 +67,47 @@ test('load returns cached metadata when cache has a hit', function () {
     $writer->flush();
 
     $loader = new CommandLoader(new CommandCache($this->cachePath));
-    $commands = $loader->load($dir);
+    $commands = $loader->loadDirectory($dir);
+
+    expect($commands)->toHaveCount(1)
+        ->and($commands[0]->getName())->toBe('app:from-cache');
+});
+
+test('loadClasses with cache writes cache file and returns commands', function () {
+    $this->cachePath = loaderCacheFile();
+    $cache = new CommandCache($this->cachePath);
+    $loader = new CommandLoader($cache);
+
+    $commands = $loader->loadClasses([CliAppTestCommand::class]);
+
+    expect($commands)->toHaveCount(1)
+        ->and($commands[0]->getName())->toBe('app:cliapp-test')
+        ->and(file_exists($this->cachePath))->toBeTrue();
+
+    $file = (new ReflectionClass(CliAppTestCommand::class))->getFileName();
+    $readCache = new CommandCache($this->cachePath);
+    $cached = $readCache->get($file);
+
+    expect($cached)->not->toBeNull()
+        ->and($cached->signature)->toBe('app:cliapp-test');
+});
+
+test('loadClasses returns cached metadata when cache has a hit', function () {
+    $this->cachePath = loaderCacheFile();
+    $file = (new ReflectionClass(CliAppTestCommand::class))->getFileName();
+
+    // Pre-populate the cache with different metadata than what the class declares
+    $fakeMetadata = new CommandMetadata(
+        target: CliAppTestCommand::class,
+        signature: 'app:from-cache',
+        description: 'Served from cache',
+    );
+    $writer = new CommandCache($this->cachePath);
+    $writer->set($file, $fakeMetadata);
+    $writer->flush();
+
+    $loader = new CommandLoader(new CommandCache($this->cachePath));
+    $commands = $loader->loadClasses([CliAppTestCommand::class]);
 
     expect($commands)->toHaveCount(1)
         ->and($commands[0]->getName())->toBe('app:from-cache');
