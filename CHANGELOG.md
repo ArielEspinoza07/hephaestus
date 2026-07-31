@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.1] - 2026-07-30
+
+### Changed
+
+- CI: added a `lowest-dependencies` job that runs `composer update --prefer-lowest` on PHP 8.3 to verify the package actually works at the floor of the `symfony/console`/`symfony/finder` constraints introduced in 2.0.0
+
+### Fixed
+
+- `CommandLoader::loadDirectory()` now trims both `/` and `\` from the input directory path instead of only the separator native to the host OS, so a path built with the "wrong" separator for the current platform is still normalized correctly
+- Stale `PHP 8.5+` / `Symfony Console 8.0+` references in the README, left over from the 2.0.0 version-floor change
+
 ## [2.0.0] - 2026-07-30
 
 ### Added
@@ -84,7 +95,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Laravel Pint PSR-12 code style enforcement
 - MIT license
 
-[Unreleased]: https://github.com/arielespinoza07/hephaestus/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/arielespinoza07/hephaestus/compare/v2.0.1...HEAD
+[2.0.1]: https://github.com/arielespinoza07/hephaestus/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/arielespinoza07/hephaestus/compare/v1.1.1...v2.0.0
 [1.1.1]: https://github.com/arielespinoza07/hephaestus/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/arielespinoza07/hephaestus/compare/v1.0.0...v1.1.0
