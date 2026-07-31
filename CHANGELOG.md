@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-07-30
+
+### Added
+
+- `CliApp::registerCommand(string $command)` — register a single command by class name, without scanning a directory
+- `CliApp::registerCommands(array $commands)` — register multiple commands by class name
+- `CliApp::withCache(string $cachePath)` — fluent cache configuration, applied to `registerCommandsDirectory()`, `registerCommand()`, and `registerCommands()` alike
+- `symfony/finder` as an explicit dependency (previously pulled in transitively via `symfony/console`)
+
+### Changed
+
+- **Breaking:** `CliApp::registerCommands(string|array $directories, ?string $cachePath = null)` renamed to `registerCommandsDirectory()`; the `$cachePath` parameter was removed in favor of `withCache()`
+- **Breaking:** `CommandLoader::load()` renamed to `loadDirectory()`
+- Lowered minimum PHP version from `^8.5` to `^8.3`; widened `symfony/console` from `^8.0.6` to `^7.4|^8.0`
+- CI matrix now tests PHP 8.3, 8.4, and 8.5 (previously only 8.5)
+- `CommandLoader::loadClasses()` now shares the same file-content-hash cache as `loadDirectory()` (resolved via `ReflectionClass::getFileName()`) instead of always re-reflecting
+- `MetadataReader::checkParentClass()` now uses `isSubclassOf()` instead of a direct-parent-only check, correctly supporting multi-level command class inheritance
+- Replaced `mb_*` string functions (`mb_strlen`, `mb_rtrim`, `mb_strtolower`, `mb_trim`) with their ASCII equivalents, consistent with the lowered PHP floor
+- `pint.json`: removed the `mb_str_functions` rule
+
+### Fixed
+
+- `MetadataReader::checkExecuteMethod()` now also verifies the `execute` method is `public`, throwing `RuntimeException` otherwise (previously only checked that it existed)
+- Replaced PHP 8.5-only syntax (`array_first()`, `array_last()`, the `|>` pipe operator) with PHP 8.3-compatible equivalents — these were breaking the CI matrix on PHP 8.3/8.4 despite the lowered version floor
+
 ## [1.1.1] - 2026-03-16
 
 ### Fixed
@@ -59,7 +84,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Laravel Pint PSR-12 code style enforcement
 - MIT license
 
-[Unreleased]: https://github.com/arielespinoza07/hephaestus/compare/v1.1.1...HEAD
+[Unreleased]: https://github.com/arielespinoza07/hephaestus/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/arielespinoza07/hephaestus/compare/v1.1.1...v2.0.0
 [1.1.1]: https://github.com/arielespinoza07/hephaestus/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/arielespinoza07/hephaestus/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/arielespinoza07/hephaestus/releases/tag/1.0.0
