@@ -62,7 +62,7 @@ final readonly class MethodParametersResolver
             /** @var ReflectionNamedType $parameterType */
             $parameterType = $parameter->getType();
             /** @var ReflectionAttribute<object> $attribute */
-            $attribute = array_first($parameter->getAttributes());
+            $attribute = $parameter->getAttributes()[0] ?? null;
             $this->checkIfParameterTypeIsAllowedByAttribute($parameter, $parameterType, $attribute);
             $parameters[] = match ($attribute->getName()) {
                 Argument::class => $this->argumentResolver->resolve($parameter),

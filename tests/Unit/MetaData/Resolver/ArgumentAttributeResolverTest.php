@@ -49,7 +49,7 @@ test('returns ArgumentMetadata', function () {
         $arguments[] = $this->resolver->resolve($parameter);
     }
 
-    $parameter = array_first($arguments);
+    $parameter = reset($arguments);
 
     expect($parameter)->toBeInstanceOf(ArgumentMetadata::class)
         ->and($parameter->name)->toBeString()

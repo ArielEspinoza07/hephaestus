@@ -20,6 +20,6 @@ final class AttributeExtractor
      */
     public function extract(ReflectionClass $class, string $attributeClass): ?ReflectionAttribute
     {
-        return array_first($class->getAttributes($attributeClass));
+        return $class->getAttributes($attributeClass)[0] ?? null;
     }
 }

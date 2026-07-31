@@ -17,12 +17,15 @@ final class OptionAttributeResolver
 {
     public function resolve(ReflectionParameter $parameter): OptionMetadata
     {
-        /** @var ReflectionAttribute<T> $attribute */
-        $attribute = array_filter(
-            array: $parameter->getAttributes(),
-            callback: fn (ReflectionAttribute $attribute) => $attribute->getName() === Option::class,
-        ) |> array_first(...);
+        $attribute = null;
+        foreach ($parameter->getAttributes() as $candidate) {
+            if ($candidate->getName() === Option::class) {
+                $attribute = $candidate;
+                break;
+            }
+        }
 
+        /** @var ReflectionAttribute<T> $attribute */
         /** @var Option $option */
         $option = $attribute->newInstance();
         /** @var ReflectionNamedType $parameterType */

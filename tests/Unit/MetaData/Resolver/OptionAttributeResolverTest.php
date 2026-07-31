@@ -49,7 +49,7 @@ test('returns OptionMetadata', function () {
         $options[] = $this->resolver->resolve($parameter);
     }
 
-    $parameter = array_last($options);
+    $parameter = end($options);
 
     expect($parameter)->toBeInstanceOf(OptionMetadata::class)
         ->and($parameter->name)->toBeString()

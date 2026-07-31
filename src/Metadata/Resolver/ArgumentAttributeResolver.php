@@ -21,12 +21,15 @@ final readonly class ArgumentAttributeResolver
      */
     public function resolve(ReflectionParameter $parameter): ArgumentMetadata
     {
-        /** @var ReflectionAttribute<T> $attribute */
-        $attribute = array_filter(
-            array: $parameter->getAttributes(),
-            callback: fn (ReflectionAttribute $attribute) => $attribute->getName() === Argument::class,
-        ) |> array_first(...);
+        $attribute = null;
+        foreach ($parameter->getAttributes() as $candidate) {
+            if ($candidate->getName() === Argument::class) {
+                $attribute = $candidate;
+                break;
+            }
+        }
 
+        /** @var ReflectionAttribute<T> $attribute */
         /** @var Argument $argument */
         $argument = $attribute->newInstance();
         /** @var ReflectionNamedType $parameterType */
