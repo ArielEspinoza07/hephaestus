@@ -20,7 +20,7 @@ final readonly class Option
         public string|int|float|bool|array|null $default = null,
         public array|string|null $shortcut = null,
     ) {
-        if (is_string($this->shortcut) && mb_strlen($this->shortcut) !== 1) {
+        if (is_string($this->shortcut) && strlen($this->shortcut) !== 1) {
             throw new InvalidArgumentException('Shortcut must be exactly 1 character');
         }
         if (is_array($this->shortcut) && empty($this->shortcut)) {
@@ -32,7 +32,7 @@ final readonly class Option
                 if (!is_string($item)) {
                     throw new InvalidArgumentException('Shortcut must be a string');
                 }
-                if (mb_strlen($item) !== 1) {
+                if (strlen($item) !== 1) {
                     throw new InvalidArgumentException('Shortcut must be exactly 1 character');
                 }
             }

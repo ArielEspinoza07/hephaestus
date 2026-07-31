@@ -39,7 +39,7 @@ final readonly class ArgumentAttributeResolver
 
         return new ArgumentMetadata(
             name: $parameter->getName(),
-            type: mb_strtolower($parameterType->getName()),
+            type: strtolower($parameterType->getName()),
             description: $argument->description,
             isRequired: $isRequired,
             default: $parameter->isDefaultValueAvailable() ? $parameter->getDefaultValue() : $argument->default,

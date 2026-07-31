@@ -21,12 +21,12 @@ final readonly class CommandResult
 
     public function output(): string
     {
-        return mb_trim(str_replace("\r\n", "\n", $this->output));
+        return trim(str_replace("\r\n", "\n", $this->output));
     }
 
     public function errorOutput(): string
     {
-        return mb_trim(str_replace("\r\n", "\n", $this->errorOutput));
+        return trim(str_replace("\r\n", "\n", $this->errorOutput));
     }
 
     public function isSuccessful(): bool
@@ -74,7 +74,7 @@ final readonly class CommandResult
 
     public function assertOutputEquals(string $expected): self
     {
-        Assert::assertSame($expected, mb_trim($this->output()), 'Output does not match expected value.');
+        Assert::assertSame($expected, trim($this->output()), 'Output does not match expected value.');
 
         return $this;
     }

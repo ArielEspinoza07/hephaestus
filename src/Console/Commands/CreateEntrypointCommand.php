@@ -78,7 +78,7 @@ final readonly class CreateEntrypointCommand extends Command
             if (! empty($composer['autoload']['psr-4'])) {
                 /** @var array<string, string> $psr4 */
                 $psr4 = $composer['autoload']['psr-4'];
-                $srcDir = mb_rtrim((string) reset($psr4), '/');
+                $srcDir = rtrim((string) reset($psr4), '/');
 
                 return $srcDir . '/Commands';
             }

@@ -44,8 +44,8 @@ final readonly class CreateCommand extends Command
 
         /** @var array<string, string> $psr4 */
         $psr4 = $composer['autoload']['psr-4'];
-        $rootNamespace = mb_rtrim((string) array_key_first($psr4), '\\');
-        $rootDir = mb_rtrim((string) reset($psr4), '/');
+        $rootNamespace = rtrim((string) array_key_first($psr4), '\\');
+        $rootDir = rtrim((string) reset($psr4), '/');
 
         $className = str_ends_with($name, 'Command') ? $name : $name . 'Command';
         $namespace = $rootNamespace . '\\Commands';
@@ -78,8 +78,18 @@ final readonly class CreateCommand extends Command
 
     private function toSignature(string $className): string
     {
-        $name = (string) preg_replace('/Command$/', '', $className);
+        $name = (string) preg_replace(
+            pattern: '/Command$/',
+            replacement: '',
+            subject: $className,
+        );
 
-        return mb_strtolower((string) preg_replace('/[A-Z]/', '-$0', lcfirst($name)));
+        return strtolower(
+            (string) preg_replace(
+                '/[A-Z]/',
+                '-$0',
+                lcfirst($name),
+            ),
+        );
     }
 }

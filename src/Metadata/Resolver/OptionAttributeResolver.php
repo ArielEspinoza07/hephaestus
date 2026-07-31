@@ -28,7 +28,7 @@ final class OptionAttributeResolver
         /** @var ReflectionNamedType $parameterType */
         $parameterType = $parameter->getType();
 
-        $type = mb_strtolower($parameterType->getName());
+        $type = strtolower($parameterType->getName());
 
         $default = $parameter->isDefaultValueAvailable() ? $parameter->getDefaultValue() : $option->default;
         if ($type === 'bool') {
