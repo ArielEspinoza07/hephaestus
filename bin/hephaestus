@@ -3,7 +3,26 @@
 
 declare(strict_types=1);
 
-require_once dirname(__DIR__) . '/vendor/autoload.php';
+$autoloadCandidates = [
+    dirname(__DIR__) . '/vendor/autoload.php',
+    dirname(__DIR__, 3) . '/autoload.php',
+];
+
+$autoloader = null;
+
+foreach ($autoloadCandidates as $candidate) {
+    if (is_file($candidate)) {
+        $autoloader = $candidate;
+        break;
+    }
+}
+
+if ($autoloader === null) {
+    fwrite(STDERR, "Unable to locate Composer's autoload.php. Run \"composer install\".\n");
+    exit(1);
+}
+
+require_once $autoloader;
 
 use Hephaestus\CliApp;
 
