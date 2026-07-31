@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.1] - 2026-07-31
+
+### Fixed
+
+- `bin/hephaestus` no longer hardcodes its own `vendor/autoload.php`, which only exists when the repo is cloned standalone; when installed as a dependency (`vendor/arielespinoza07/hephaestus`), the package has no `vendor/` of its own, so running `vendor/bin/hephaestus` in a consuming project failed with `Failed to open stream`. It now resolves the consuming project's `vendor/autoload.php` as well.
+
 ## [3.0.0] - 2026-07-31
 
 ### Added
@@ -110,7 +116,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Laravel Pint PSR-12 code style enforcement
 - MIT license
 
-[Unreleased]: https://github.com/arielespinoza07/hephaestus/compare/v3.0.0...HEAD
+[Unreleased]: https://github.com/arielespinoza07/hephaestus/compare/v3.0.1...HEAD
+[3.0.1]: https://github.com/arielespinoza07/hephaestus/compare/v3.0.0...v3.0.1
 [3.0.0]: https://github.com/arielespinoza07/hephaestus/compare/v2.0.1...v3.0.0
 [2.0.1]: https://github.com/arielespinoza07/hephaestus/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/arielespinoza07/hephaestus/compare/v1.1.1...v2.0.0
