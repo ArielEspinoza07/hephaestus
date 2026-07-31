@@ -28,7 +28,7 @@ final readonly class CreateEntrypointCommand extends Command
         #[Option(description: 'Overwrite the file if it already exists', shortcut: 'f')]
         bool $force = false,
     ): int {
-        if ($this->output === null) {
+        if ($this->consoleIO->output === null) {
             return self::FAILURE;
         }
 
@@ -42,7 +42,7 @@ final readonly class CreateEntrypointCommand extends Command
         }
 
         if (file_exists($filePath) && $force === false) {
-            $this->output->writeln('<comment>' . $filePath . ' already exists. Use --force to overwrite.</comment>');
+            $this->consoleIO->output->writeln('<comment>' . $filePath . ' already exists. Use --force to overwrite.</comment>');
 
             return self::FAILURE;
         }
@@ -57,9 +57,9 @@ final readonly class CreateEntrypointCommand extends Command
         file_put_contents($filePath, $content);
         @chmod($filePath, 0755);
 
-        $this->output->writeln('<info>Entrypoint created: ' . $filePath . '</info>');
-        $this->output->writeln('');
-        $this->output->writeln('<comment>Next: add "bin": ["bin/' . $name . '"] to your composer.json, then run composer dump-autoload.</comment>');
+        $this->consoleIO->output->writeln('<info>Entrypoint created: ' . $filePath . '</info>');
+        $this->consoleIO->output->writeln('');
+        $this->consoleIO->output->writeln('<comment>Next: add "bin": ["bin/' . $name . '"] to your composer.json, then run composer dump-autoload.</comment>');
 
         return self::SUCCESS;
     }

@@ -24,7 +24,7 @@ final readonly class CountCommand extends Command
         #[Option(description: 'Enable verbose mode')]
         bool $verbose,
     ): int {
-        $this->output->writeln(sprintf('count=%d ratio=%.2f verbose=%s', $count, $ratio, $verbose ? 'true' : 'false'));
+        $this->consoleIO->output->writeln(sprintf('count=%d ratio=%.2f verbose=%s', $count, $ratio, $verbose ? 'true' : 'false'));
 
         return self::SUCCESS;
     }

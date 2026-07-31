@@ -23,7 +23,7 @@ final readonly class GreetCommand extends Command
         bool $yell,
     ): int {
         $name = $yell ? mb_strtoupper($name) : $name;
-        $this->output->writeln(sprintf('Hello, %s!', $name));
+        $this->consoleIO->output->writeln(sprintf('Hello, %s!', $name));
 
         return self::SUCCESS;
     }

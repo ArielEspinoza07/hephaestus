@@ -72,7 +72,7 @@ final readonly class GreetCommand extends Command
         bool $yell = false,
     ): int {
         $greeting = sprintf('Hello, %s!', $name);
-        $this->output->writeln($yell ? strtoupper($greeting) : $greeting);
+        $this->consoleIO->output->writeln($yell ? strtoupper($greeting) : $greeting);
 
         return self::SUCCESS;
     }
@@ -232,9 +232,9 @@ MetadataReader  ──►  CommandMetadata
 | `#[Help('...')]`                     | | Extended help shown by `help <command>` |
 | `#[Usage(['app:name arg1', '...'])]` | | Example usages shown in help output |
 | `#[Alias('alias1\|alias2')]`         | | Pipe-separated command aliases |
-| `#[Input]`                           | | Inject `InputInterface` into `$this->input` |
-| `#[Output]`                          | | Inject `OutputInterface` into `$this->output` |
-| `#[Style]`                           | | Inject `SymfonyStyle ` into `$this->output` |
+| `#[Input]`                           | | Inject `InputInterface` into `$this->consoleIO->input` |
+| `#[Output]`                          | | Inject `OutputInterface` into `$this->consoleIO->output` |
+| `#[Style]`                           | | Inject `SymfonyStyle ` into `$this->consoleIO->output` |
 
 ### Parameter-level attributes
 
@@ -303,18 +303,21 @@ public function execute(
 All commands extend `Hephaestus\Console\Command` and must be `final readonly`.
 
 ```php
-abstract readonly class Command
+abstract readonly class Command implements CommandInterface
 {
-    // Available when #[Input] is declared on the class
-    protected ?InputInterface $input;
+    use HasInput;
+    use HasOutput;
 
-    // Available when #[Output] is declared on the class
-    protected ?OutputInterface $output;
-
-    // Exit code constants
     protected const int SUCCESS = 0;
     protected const int FAILURE = 1;
     protected const int INVALID = 2;
+
+    protected ConsoleIO $consoleIO;
+
+    public function __construct(?ConsoleIO $consoleIO = null)
+    {
+        $this->consoleIO = $consoleIO ?? new ConsoleIO();
+    }
 }
 ```
 

@@ -21,9 +21,9 @@ final readonly class CreateUserCommand extends Command
         #[CompositeInput]
         CreateUser $user
     ): int {
-        $this->output->writeln(sprintf('User %s with email %s created!', $user->name, $user->email));
+        $this->consoleIO->output->writeln(sprintf('User %s with email %s created!', $user->name, $user->email));
         if ($user->isAdmin) {
-            $this->output->writeln('User is an admin!');
+            $this->consoleIO->output->writeln('User is an admin!');
         }
 
         return self::SUCCESS;

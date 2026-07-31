@@ -13,9 +13,8 @@ trait HasInput
      */
     public function withInput(InputInterface $input): static
     {
-        return new static(
-            input: $input,
-            output: $this->output,
-        );
+        $this->consoleIO->input = $input;
+
+        return $this;
     }
 }

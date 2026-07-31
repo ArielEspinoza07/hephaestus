@@ -22,13 +22,13 @@ final readonly class CreateCommand extends Command
         #[Option(description: 'Overwrite the file if it already exists', shortcut: 'f')]
         bool $force = false,
     ): int {
-        if ($this->output === null) {
+        if ($this->consoleIO->output === null) {
             return self::FAILURE;
         }
 
         $composerPath = getcwd() . '/composer.json';
         if (! file_exists($composerPath)) {
-            $this->output->writeln('<error>composer.json not found in current directory.</error>');
+            $this->consoleIO->output->writeln('<error>composer.json not found in current directory.</error>');
 
             return self::FAILURE;
         }
@@ -37,7 +37,7 @@ final readonly class CreateCommand extends Command
         $composer = json_decode((string) file_get_contents($composerPath), true);
 
         if (empty($composer['autoload']['psr-4'])) {
-            $this->output->writeln('<error>No autoload.psr-4 entry found in composer.json.</error>');
+            $this->consoleIO->output->writeln('<error>No autoload.psr-4 entry found in composer.json.</error>');
 
             return self::FAILURE;
         }
@@ -57,7 +57,7 @@ final readonly class CreateCommand extends Command
         }
 
         if (file_exists($filePath) && ! $force) {
-            $this->output->writeln('<comment>' . $filePath . ' already exists. Use --force to overwrite.</comment>');
+            $this->consoleIO->output->writeln('<comment>' . $filePath . ' already exists. Use --force to overwrite.</comment>');
 
             return self::FAILURE;
         }
@@ -71,7 +71,7 @@ final readonly class CreateCommand extends Command
 
         file_put_contents($filePath, $content);
 
-        $this->output->writeln('<info>Command created: ' . $filePath . '</info>');
+        $this->consoleIO->output->writeln('<info>Command created: ' . $filePath . '</info>');
 
         return self::SUCCESS;
     }

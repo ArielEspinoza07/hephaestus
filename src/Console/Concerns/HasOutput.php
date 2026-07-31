@@ -13,9 +13,8 @@ trait HasOutput
      */
     public function withOutput(OutputInterface $output): static
     {
-        return new static(
-            input: $this->input,
-            output: $output,
-        );
+        $this->consoleIO->output = $output;
+
+        return $this;
     }
 }

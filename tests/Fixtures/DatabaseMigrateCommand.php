@@ -34,23 +34,23 @@ final readonly class DatabaseMigrateCommand extends Command
         array $columns = [],
     ): int {
         // Display header
-        $this->output->info('=== Database Migration ===');
-        $this->output->newLine();
+        $this->consoleIO->output->info('=== Database Migration ===');
+        $this->consoleIO->output->newLine();
 
         // Show configuration
-        $this->output->writeln("Database: {$database}");
+        $this->consoleIO->output->writeln("Database: {$database}");
 
         if ($table) {
-            $this->output->writeln("Target table: {$table}");
+            $this->consoleIO->output->writeln("Target table: {$table}");
         } else {
-            $this->output->comment('Migrating all tables');
+            $this->consoleIO->output->comment('Migrating all tables');
         }
 
         if (! empty($columns)) {
-            $this->output->writeln('Specific columns: '.implode(', ', $columns));
+            $this->consoleIO->output->writeln('Specific columns: '.implode(', ', $columns));
         }
 
-        $this->output->newLine();
+        $this->consoleIO->output->newLine();
 
         // Show options
         $options = [];
@@ -62,13 +62,13 @@ final readonly class DatabaseMigrateCommand extends Command
         }
 
         if (! empty($options)) {
-            $this->output->warning('Options: '.implode(', ', $options));
-            $this->output->newLine();
+            $this->consoleIO->output->warning('Options: '.implode(', ', $options));
+            $this->consoleIO->output->newLine();
         }
 
         // Simulate migration steps
-        $this->output->info('Running migrations...');
-        $this->output->newLine();
+        $this->consoleIO->output->info('Running migrations...');
+        $this->consoleIO->output->newLine();
 
         // Show migration progress in a table
         $migrations = [
@@ -77,23 +77,23 @@ final readonly class DatabaseMigrateCommand extends Command
             ['add_email_to_users', '2024-01-03', 'completed'],
         ];
 
-        $this->output->table(
+        $this->consoleIO->output->table(
             ['Migration', 'Date', 'Status'],
             $migrations
         );
 
-        $this->output->newLine();
+        $this->consoleIO->output->newLine();
 
         // Handle seeding if requested
         if ($seed) {
-            $this->output->info('Seeding database...');
-            $this->output->writeln('  ✓ Users seeded');
-            $this->output->writeln('  ✓ Posts seeded');
-            $this->output->newLine();
+            $this->consoleIO->output->info('Seeding database...');
+            $this->consoleIO->output->writeln('  ✓ Users seeded');
+            $this->consoleIO->output->writeln('  ✓ Posts seeded');
+            $this->consoleIO->output->newLine();
         }
 
         // Display summary
-        $this->output->success('Migration completed successfully!');
+        $this->consoleIO->output->success('Migration completed successfully!');
 
         return self::SUCCESS;
     }
