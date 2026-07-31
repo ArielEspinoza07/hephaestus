@@ -38,7 +38,7 @@ final readonly class CommandLoader
 
         $files = $finder
             ->files()
-            ->in(rtrim($directory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR)
+            ->in(rtrim($directory, '/\\') . DIRECTORY_SEPARATOR)
             ->name('*Command.php');
 
         $commands = [];
