@@ -131,7 +131,12 @@ Generate a command class skeleton inside your project's `src/Commands/` director
 
 ./vendor/bin/hephaestus make:command Greet --force   # overwrite existing
 ./vendor/bin/hephaestus make:command Greet -f        # shortcut
+
+./vendor/bin/hephaestus make:command Greet --dir=src/Admin/Commands
+# → src/Admin/Commands/GreetCommand.php, namespaced App\Admin\Commands
 ```
+
+`--dir` must resolve inside the PSR-4 root directory from `composer.json` — the namespace is derived from it, so the generated class always autoloads correctly.
 
 The generated file:
 
@@ -269,10 +274,11 @@ Maps a named CLI option (`command --option` or `command --option=value`).
 
 ```php
 #[Option(
-    description: 'Shout the greeting',  // shown in help
+    description: 'Shout the greeting',   // shown in help
     acceptValue: false,                  // true: --format=json, false: --verbose flag
     default: null,                       // default value when not provided
     shortcut: 'l',                       // single char or array of chars
+    name: 'loud'                         // set a custom name for the option
 )]
 bool $yell
 ```

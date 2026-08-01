@@ -24,6 +24,8 @@ final readonly class CreateCommand extends Command
     public function execute(
         #[Argument(description: 'The name of the command class to create')]
         string $name,
+        #[Option(description: 'Relative path to commands directory (e.g. src/Commands)', acceptValue: true)]
+        string $dir = '',
         #[Option(description: 'Overwrite the file if it already exists', shortcut: 'f')]
         bool $force = false,
     ): int {
@@ -52,9 +54,17 @@ final readonly class CreateCommand extends Command
         $rootNamespace = rtrim((string) array_key_first($psr4), '\\');
         $rootDir = rtrim((string) reset($psr4), '/');
 
+        $relativeDir = $dir !== '' ? $dir : $rootDir . '/Commands';
+
+        if (! str_starts_with($relativeDir, $rootDir . '/') && $relativeDir !== $rootDir) {
+            $this->consoleIO->output->writeln('<error>--dir must be inside "' . $rootDir . '" to match the "' . $rootNamespace . '" PSR-4 mapping in composer.json.</error>');
+
+            return self::FAILURE;
+        }
+
         $className = str_ends_with($name, 'Command') ? $name : $name . 'Command';
-        $namespace = $rootNamespace . '\\Commands';
-        $directory = getcwd() . '/' . $rootDir . '/Commands';
+        $namespace = $this->resolveNamespace($rootNamespace, $rootDir, $relativeDir);
+        $directory = getcwd() . '/' . $relativeDir;
         $filePath = $directory . '/' . $className . '.php';
 
         if (! is_dir($directory)) {
@@ -79,6 +89,13 @@ final readonly class CreateCommand extends Command
         $this->consoleIO->output->writeln('<info>Command created: ' . $filePath . '</info>');
 
         return self::SUCCESS;
+    }
+
+    private function resolveNamespace(string $rootNamespace, string $rootDir, string $relativeDir): string
+    {
+        $suffix = ltrim(substr($relativeDir, strlen($rootDir)), '/');
+
+        return $suffix !== '' ? $rootNamespace . '\\' . str_replace('/', '\\', $suffix) : $rootNamespace;
     }
 
     private function toSignature(string $className): string
