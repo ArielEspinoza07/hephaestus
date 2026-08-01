@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.0] - 2026-07-31
+
+### Changed
+
+- **Breaking:** `Command::__construct()` is now `protected`; every command class must declare its own public constructor calling `parent::__construct()` to remain instantiable. `ConsoleIO` can no longer be supplied through a subclass that doesn't declare its own constructor — it must be wired up afterward via `withInput()`/`withOutput()`
+- Removed the now-unneeded `@phpstan-consistent-constructor` annotation from `Command`, and the redundant `@return static` docblocks from `HasInput::withInput()`/`HasOutput::withOutput()` (the native `static` return type already covers it)
+- `make:command`/`make:entrypoint` scaffolding and the built-in `CreateCommand`/`CreateEntrypointCommand` now generate/require the explicit public constructor
+
 ## [3.0.1] - 2026-07-31
 
 ### Fixed
@@ -116,7 +124,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Laravel Pint PSR-12 code style enforcement
 - MIT license
 
-[Unreleased]: https://github.com/arielespinoza07/hephaestus/compare/v3.0.1...HEAD
+[Unreleased]: https://github.com/arielespinoza07/hephaestus/compare/v4.0.0...HEAD
+[4.0.0]: https://github.com/arielespinoza07/hephaestus/compare/v3.0.1...v4.0.0
 [3.0.1]: https://github.com/arielespinoza07/hephaestus/compare/v3.0.0...v3.0.1
 [3.0.0]: https://github.com/arielespinoza07/hephaestus/compare/v2.0.1...v3.0.0
 [2.0.1]: https://github.com/arielespinoza07/hephaestus/compare/v2.0.0...v2.0.1
