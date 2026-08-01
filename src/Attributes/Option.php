@@ -19,6 +19,7 @@ final readonly class Option
         public bool $acceptValue = false,
         public string|int|float|bool|array|null $default = null,
         public array|string|null $shortcut = null,
+        public ?string $name = null,
     ) {
         if (is_string($this->shortcut) && strlen($this->shortcut) !== 1) {
             throw new InvalidArgumentException('Shortcut must be exactly 1 character');

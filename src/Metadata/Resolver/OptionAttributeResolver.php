@@ -39,7 +39,7 @@ final class OptionAttributeResolver
         }
 
         return new OptionMetadata(
-            name: $parameter->getName(),
+            name: $option->name ?? $parameter->getName(),
             type: $type,
             description: $option->description,
             acceptValue: $type === 'bool' ? false : $option->acceptValue,
