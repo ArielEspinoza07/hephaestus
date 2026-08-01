@@ -8,9 +8,6 @@ use Symfony\Component\Console\Input\InputInterface;
 
 trait HasInput
 {
-    /**
-     * @return static
-     */
     public function withInput(InputInterface $input): static
     {
         $this->consoleIO->input = $input;

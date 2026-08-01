@@ -12,4 +12,10 @@ use Hephaestus\Console\Command;
 #[Description('Test command')]
 #[Help('This is a test command')]
 #[Usage(['app:test'])]
-final readonly class NoSignatureCommand extends Command {}
+final readonly class NoSignatureCommand extends Command
+{
+    public function __construct()
+    {
+        parent::__construct();
+    }
+}

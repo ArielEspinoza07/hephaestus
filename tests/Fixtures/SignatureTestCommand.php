@@ -14,6 +14,11 @@ use Hephaestus\Console\Command;
 #[Output]
 final readonly class SignatureTestCommand extends Command
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function execute(): int
     {
         return self::SUCCESS;

@@ -15,6 +15,11 @@ use Hephaestus\Console\Command;
 #[Output]
 final readonly class SendEmailCommand extends Command
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function execute(
         #[CompositeInput]
         SendEmail $email,

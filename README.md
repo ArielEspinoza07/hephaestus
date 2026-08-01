@@ -65,6 +65,11 @@ use Hephaestus\Attributes\Option;
 #[Output]
 final readonly class GreetCommand extends Command
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function execute(
         #[Argument(description: 'The name of the user to greet')]
         string $name,
@@ -147,6 +152,11 @@ use Hephaestus\Console\Command;
 #[Output]
 final readonly class GreetCommand extends Command
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function execute(): int
     {
         return self::SUCCESS;
@@ -314,9 +324,26 @@ abstract readonly class Command implements CommandInterface
 
     protected ConsoleIO $consoleIO;
 
-    public function __construct(?ConsoleIO $consoleIO = null)
+    protected function __construct()
     {
-        $this->consoleIO = $consoleIO ?? new ConsoleIO();
+        $this->consoleIO = new ConsoleIO();
+    }
+}
+```
+
+`__construct()` is `protected`, so every command must declare its own public constructor calling `parent::__construct()` — `ConsoleIO` is wired up afterward via `withInput()`/`withOutput()`, never passed in directly:
+
+```php
+final readonly class GreetCommand extends Command
+{
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    public function execute(/* ... */): int
+    {
+        // ...
     }
 }
 ```

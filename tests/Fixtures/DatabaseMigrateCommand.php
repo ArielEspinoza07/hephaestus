@@ -18,6 +18,11 @@ use Hephaestus\Console\Command;
 #[Style]
 final readonly class DatabaseMigrateCommand extends Command
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     /**
      * @param list<string> $columns
      */

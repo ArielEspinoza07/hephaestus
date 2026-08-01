@@ -12,6 +12,11 @@ use Hephaestus\Console\Command;
 #[Description('Multi directory test command 2')]
 final readonly class Multi2Command extends Command
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function execute(): int
     {
         return self::SUCCESS;

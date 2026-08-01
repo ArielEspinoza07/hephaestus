@@ -12,6 +12,11 @@ use Hephaestus\Console\Command;
 #[Description('Command with cache enabled')]
 final readonly class WithCacheCommand extends Command
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function execute(): int
     {
         return self::SUCCESS;

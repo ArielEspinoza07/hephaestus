@@ -8,9 +8,6 @@ use Hephaestus\Console\Concerns\HasInput;
 use Hephaestus\Console\Concerns\HasOutput;
 use Hephaestus\Contracts\CommandInterface;
 
-/**
- * @phpstan-consistent-constructor
- */
 abstract readonly class Command implements CommandInterface
 {
     use HasInput;
@@ -22,8 +19,8 @@ abstract readonly class Command implements CommandInterface
 
     protected ConsoleIO $consoleIO;
 
-    public function __construct(?ConsoleIO $consoleIO = null)
+    protected function __construct()
     {
-        $this->consoleIO = $consoleIO ?? new ConsoleIO();
+        $this->consoleIO = new ConsoleIO();
     }
 }

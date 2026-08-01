@@ -16,6 +16,11 @@ use Hephaestus\Console\Command;
 #[Output]
 final readonly class CountCommand extends Command
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function execute(
         #[Argument(description: 'An integer count')]
         int $count,

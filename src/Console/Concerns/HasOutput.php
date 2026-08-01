@@ -8,9 +8,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 trait HasOutput
 {
-    /**
-     * @return static
-     */
     public function withOutput(OutputInterface $output): static
     {
         $this->consoleIO->output = $output;

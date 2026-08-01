@@ -17,6 +17,11 @@ use Hephaestus\Console\Command;
 #[Output]
 final readonly class CreateUserCommand extends Command
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function execute(
         #[CompositeInput]
         CreateUser $user

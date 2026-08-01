@@ -16,6 +16,11 @@ use Hephaestus\Console\Command;
 #[Output]
 final readonly class CreateEntrypointCommand extends Command
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function execute(
         #[Argument(description: 'The name of the entrypoint file to create in bin/ (e.g. app)')]
         string $name,

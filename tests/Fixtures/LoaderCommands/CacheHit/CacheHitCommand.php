@@ -12,6 +12,11 @@ use Hephaestus\Console\Command;
 #[Description('Real command (its metadata should be overridden by cache hit test)')]
 final readonly class CacheHitCommand extends Command
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function execute(): int
     {
         return self::SUCCESS;

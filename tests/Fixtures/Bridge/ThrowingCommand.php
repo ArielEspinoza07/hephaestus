@@ -11,6 +11,11 @@ use RuntimeException;
 #[Signature('bridge:throw')]
 final readonly class ThrowingCommand extends Command
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function execute(): int
     {
         throw new RuntimeException('deliberate failure');
