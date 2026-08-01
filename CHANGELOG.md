@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.1.0] - 2026-07-31
+
+### Added
+
+- `#[Option]` accepts an optional `name` to override the CLI-facing option name independently of the PHP parameter name (e.g. a `bool $dryRun` parameter can expose `--dry-run`)
+- `make:command` accepts `--dir` to generate the command outside the default `<psr4-root>/Commands` directory; the namespace is derived from the same path so the generated class always autoloads correctly, and a `--dir` outside the detected PSR-4 root is rejected with a clear error instead of silently producing an unloadable class
+
 ## [4.0.0] - 2026-07-31
 
 ### Changed
@@ -124,7 +131,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Laravel Pint PSR-12 code style enforcement
 - MIT license
 
-[Unreleased]: https://github.com/arielespinoza07/hephaestus/compare/v4.0.0...HEAD
+[Unreleased]: https://github.com/arielespinoza07/hephaestus/compare/v4.1.0...HEAD
+[4.1.0]: https://github.com/arielespinoza07/hephaestus/compare/v4.0.0...v4.1.0
 [4.0.0]: https://github.com/arielespinoza07/hephaestus/compare/v3.0.1...v4.0.0
 [3.0.1]: https://github.com/arielespinoza07/hephaestus/compare/v3.0.0...v3.0.1
 [3.0.0]: https://github.com/arielespinoza07/hephaestus/compare/v2.0.1...v3.0.0
