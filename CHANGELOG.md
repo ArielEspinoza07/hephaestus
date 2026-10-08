@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.0.0] - 2026-10-08
+
+### Added
+
+- `CommandRunner::withInputs()` supplies answers to interactive questions, consumed in order; without inputs the command runs non-interactively and questions fall back to their default instead of blocking on STDIN
+- `CommandRunner::withContainer()` resolves the command through a PSR-11 container, so commands with constructor dependencies can be tested
+- `CommandResult::assertErrorOutputEquals()` for exact matches on the error output
+
+### Changed
+
+- **Breaking:** `CommandRunner` now runs the command through a fresh Symfony `Application` (via `ApplicationTester`) instead of `CommandTester`, so tests behave like the real CLI. Exceptions, including invalid input such as missing arguments, are rendered to the error output only; previously the message was also copied into `output()`. Use `errorOutput()` / `assertErrorOutputContains()` instead
+- **Breaking:** the exit code of a failed run is now the exception code (`1` when it is `0` or not numeric) instead of always `1`
+- **Breaking:** `\Error`s (`TypeError`, ...) are no longer caught and reported as a failed result; they propagate out of `run()` so bugs fail the test instead of satisfying `assertFailed()`
+- **Breaking:** `CommandRunner` is immutable; `withArgs()` and `withOptions()` return a new instance instead of mutating the runner, so `$runner->withArgs([...]); $runner->run();` must become `$runner = $runner->withArgs([...]);`
+- **Breaking:** calling `withArgs()` or `withOptions()` more than once now merges the values (later keys win) instead of replacing them
+- **Breaking:** because commands now run inside an `Application`, an option that shares a name or shortcut with a Symfony global option (`verbose`, `quiet`, `help`, ...) fails in tests as it already did in the real CLI
+
+### Fixed
+
+- `CommandRunner::withOptions()` no longer turns shortcut keys such as `-l` into `---l`; keys that already start with `-` are passed through unchanged
+
 ## [4.1.0] - 2026-07-31
 
 ### Added
@@ -131,7 +152,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Laravel Pint PSR-12 code style enforcement
 - MIT license
 
-[Unreleased]: https://github.com/arielespinoza07/hephaestus/compare/v4.1.0...HEAD
+[Unreleased]: https://github.com/arielespinoza07/hephaestus/compare/v5.0.0...HEAD
+[5.0.0]: https://github.com/arielespinoza07/hephaestus/compare/v4.1.0...v5.0.0
 [4.1.0]: https://github.com/arielespinoza07/hephaestus/compare/v4.0.0...v4.1.0
 [4.0.0]: https://github.com/arielespinoza07/hephaestus/compare/v3.0.1...v4.0.0
 [3.0.1]: https://github.com/arielespinoza07/hephaestus/compare/v3.0.0...v3.0.1
