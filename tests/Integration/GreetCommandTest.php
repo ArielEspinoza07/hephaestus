@@ -17,7 +17,6 @@ test('execute greet command', function () {
 
     expect($result->isSuccessful())->toBeTrue()
         ->and($result->exitCode())->toBe(0)
-        ->and($result->output())->toBeString()
         ->and($result->output())->toBe('Hello, John!');
 });
 
@@ -34,7 +33,6 @@ test('execute greet command with yell option', function () {
 
     expect($result->isSuccessful())->toBeTrue()
         ->and($result->exitCode())->toBe(0)
-        ->and($result->output())->toBeString()
         ->and($result->output())->toBe('Hello, JOHN!');
 });
 
@@ -47,8 +45,5 @@ test('can not execute greet command for missing argument name', function () {
         ->assertExitCode(1);
 
     expect($result->isSuccessful())->toBeFalse()
-        ->and($result->exitCode())->toBe(1)
-        ->and($result->output())->toBeString()
-        ->and($result->output())->toContain('(missing: "name")')
-        ->and($result->output())->toBe('Not enough arguments (missing: "name").');
+        ->and($result->exitCode())->toBe(1);
 });

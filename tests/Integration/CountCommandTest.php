@@ -11,17 +11,17 @@ test('int and float arguments are automatically cast', function () {
         ->run();
 
     $result->assertSuccessful()
-        ->assertOutputEquals('count=5 ratio=3.14 verbose=false')
+        ->assertOutputEquals('count=5 ratio=3.14 force=false')
         ->assertExitCode(0);
 });
 
 test('bool option is cast correctly when set', function () {
     $result = CommandRunner::for(CountCommand::class)
         ->withArgs(['count' => '2', 'ratio' => '1.5'])
-        ->withOptions(['verbose' => true])
+        ->withOptions(['force' => true])
         ->run();
 
     $result->assertSuccessful()
-        ->assertOutputEquals('count=2 ratio=1.50 verbose=true')
+        ->assertOutputEquals('count=2 ratio=1.50 force=true')
         ->assertExitCode(0);
 });

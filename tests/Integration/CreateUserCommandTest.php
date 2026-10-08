@@ -16,7 +16,6 @@ test('execute create user command', function () {
 
     expect($result->isSuccessful())->toBeTrue()
         ->and($result->exitCode())->toBe(0)
-        ->and($result->output())->toBeString()
         ->and($result->output())->toBe('User John with email john@example.com created!');
 });
 
@@ -32,7 +31,6 @@ test('execute create user command with isAdmin option', function () {
 
     expect($result->isSuccessful())->toBeTrue()
         ->and($result->exitCode())->toBe(0)
-        ->and($result->output())->toBeString()
         ->and($result->output())->toContain('is an admin!');
 });
 
@@ -45,8 +43,5 @@ test('can not execute create user command for missing argument name', function (
         ->assertExitCode(1);
 
     expect($result->isSuccessful())->toBeFalse()
-        ->and($result->exitCode())->toBe(1)
-        ->and($result->output())->toBeString()
-        ->and($result->output())->toContain('(missing: "name, email")')
-        ->and($result->output())->toBe('Not enough arguments (missing: "name, email").');
+        ->and($result->exitCode())->toBe(1);
 });

@@ -26,10 +26,10 @@ final readonly class CountCommand extends Command
         int $count,
         #[Argument(description: 'A float ratio')]
         float $ratio,
-        #[Option(description: 'Enable verbose mode')]
-        bool $verbose,
+        #[Option(description: 'Force the operation', acceptValue: false)]
+        bool $force = false,
     ): int {
-        $this->consoleIO->output->writeln(sprintf('count=%d ratio=%.2f verbose=%s', $count, $ratio, $verbose ? 'true' : 'false'));
+        $this->consoleIO->output->writeln(sprintf('count=%d ratio=%.2f force=%s', $count, $ratio, $force ? 'true' : 'false'));
 
         return self::SUCCESS;
     }

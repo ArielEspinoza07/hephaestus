@@ -4,25 +4,28 @@ declare(strict_types=1);
 
 namespace Hephaestus\Testing;
 
-use Hephaestus\Bridge\SymfonyCommandBridge;
+use Hephaestus\CommandLoader;
 use Hephaestus\Console\Command;
-use Hephaestus\Metadata\MetadataReader;
+use Psr\Container\ContainerInterface;
 use ReflectionException;
-use Symfony\Component\Console\Tester\CommandTester;
-use Throwable;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Tester\ApplicationTester;
 
-final class CommandRunner
+final readonly class CommandRunner
 {
-    /** @var array<string, mixed> */
-    private array $args = [];
-
-    /** @var array<string, mixed> */
-    private array $options = [];
-
     /**
      * @param class-string<Command> $commandClass
+     * @param array<string, mixed> $args
+     * @param array<string, mixed> $options
+     * @param list<string> $inputs
      */
-    private function __construct(private readonly string $commandClass) {}
+    private function __construct(
+        private string $commandClass,
+        private array $args = [],
+        private array $options = [],
+        private array $inputs = [],
+        private ?ContainerInterface $container = null,
+    ) {}
 
     /**
      * @param class-string<Command> $commandClass
@@ -33,23 +36,38 @@ final class CommandRunner
     }
 
     /**
+     * Merges the given arguments into the ones already set.
+     *
      * @param array<string, mixed> $args
      */
     public function withArgs(array $args): self
     {
-        $this->args = $args;
-
-        return $this;
+        return $this->copy(args: [...$this->args, ...$args]);
     }
 
     /**
-     * @param array<string, mixed> $options — without '--', auto-prefixed
+     * Merges the given options into the ones already set. Keys without a leading dash are prefixed with '--'.
+     *
+     * @param array<string, mixed> $options
      */
     public function withOptions(array $options): self
     {
-        $this->options = $options;
+        return $this->copy(options: [...$this->options, ...$options]);
+    }
 
-        return $this;
+    /**
+     * Appends answers for interactive questions, consumed in order.
+     *
+     * @param list<string> $inputs
+     */
+    public function withInputs(array $inputs): self
+    {
+        return $this->copy(inputs: [...$this->inputs, ...$inputs]);
+    }
+
+    public function withContainer(ContainerInterface $container): self
+    {
+        return $this->copy(container: $container);
     }
 
     /**
@@ -57,34 +75,34 @@ final class CommandRunner
      */
     public function run(): CommandResult
     {
-        /** @var MetadataReader<object> $reader */
-        $reader = new MetadataReader();
-        $bridge = new SymfonyCommandBridge();
+        $loader = new CommandLoader(container: $this->container);
+        $command = $loader->loadClasses([$this->commandClass])[0];
 
-        $metadata = $reader->read($this->commandClass);
-        $command = $bridge->convert($metadata);
+        $app = new Application();
+        $app->setAutoExit(false);
+        $app->addCommand($command);
 
-        $input = array_merge($this->args, $this->prefixedOptions());
+        $tester = new ApplicationTester($app);
+        $tester->setInputs($this->inputs);
 
-        $tester = new CommandTester($command);
+        $tester->run(
+            [
+                'command' => $command->getName(),
+                ...$this->args,
+                ...$this->prefixedOptions(),
+            ],
+            [
+                'decorated' => false,
+                'capture_stderr_separately' => true,
+                'interactive' => $this->inputs !== [],
+            ],
+        );
 
-        try {
-            $tester->execute($input, ['decorated' => false, 'capture_stderr_separately' => true]);
-
-            return new CommandResult(
-                exitCode: $tester->getStatusCode(),
-                output: $tester->getDisplay(true),
-                errorOutput: $tester->getErrorOutput(true),
-            );
-        } catch (Throwable $e) {
-            $message = $e->getMessage() . "\n";
-
-            return new CommandResult(
-                exitCode: 1,
-                output: $message,
-                errorOutput: $message,
-            );
-        }
+        return new CommandResult(
+            exitCode: $tester->getStatusCode(),
+            output: $tester->getDisplay(true),
+            errorOutput: $tester->getErrorOutput(true),
+        );
     }
 
     /**
@@ -94,10 +112,30 @@ final class CommandRunner
     {
         $prefixed = [];
         foreach ($this->options as $key => $value) {
-            $normalizedKey = str_starts_with($key, '--') ? $key : '--' . $key;
+            $normalizedKey = str_starts_with($key, '-') ? $key : '--' . $key;
             $prefixed[$normalizedKey] = $value;
         }
 
         return $prefixed;
+    }
+
+    /**
+     * @param array<string, mixed>|null $args
+     * @param array<string, mixed>|null $options
+     * @param list<string>|null $inputs
+     */
+    private function copy(
+        ?array $args = null,
+        ?array $options = null,
+        ?array $inputs = null,
+        ?ContainerInterface $container = null,
+    ): self {
+        return new self(
+            commandClass: $this->commandClass,
+            args: $args ?? $this->args,
+            options: $options ?? $this->options,
+            inputs: $inputs ?? $this->inputs,
+            container: $container ?? $this->container,
+        );
     }
 }

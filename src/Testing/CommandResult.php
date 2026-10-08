@@ -74,7 +74,7 @@ final readonly class CommandResult
 
     public function assertOutputEquals(string $expected): self
     {
-        Assert::assertSame($expected, trim($this->output()), 'Output does not match expected value.');
+        Assert::assertSame($expected, $this->output(), 'Output does not match expected value.');
 
         return $this;
     }
@@ -85,6 +85,13 @@ final readonly class CommandResult
             'Expected error output to contain "%s".',
             $needle,
         ));
+
+        return $this;
+    }
+
+    public function assertErrorOutputEquals(string $expected): self
+    {
+        Assert::assertSame($expected, $this->errorOutput(), 'Error output does not match expected value.');
 
         return $this;
     }
