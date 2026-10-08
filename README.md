@@ -231,7 +231,7 @@ MetadataReader  ──►  CommandMetadata
                   SymfonyCommandBridge  ──►  Symfony Command
                                                    │
                                                    ▼
-                                             CLI / CommandTester
+                                             CLI / ApplicationTester
 ```
 
 ---
@@ -275,7 +275,7 @@ Maps a named CLI option (`command --option` or `command --option=value`).
 ```php
 #[Option(
     description: 'Shout the greeting',   // shown in help
-    acceptValue: false,                  // true: --format=json, false: --verbose flag
+    acceptValue: false,                  // true: --format=json, false: --force flag
     default: null,                       // default value when not provided
     shortcut: 'l',                       // single char or array of chars
     name: 'loud'                         // set a custom name for the option
@@ -284,6 +284,8 @@ bool $yell
 ```
 
 > **Type casting**: When the parameter type is `int`, `float`, or `bool`, the raw CLI string is automatically cast before being passed to `execute()`.
+
+> **Reserved names**: Symfony registers global options on every application: `help` (`-h`), `quiet` (`-q`), `silent`, `verbose` (`-v`), `version` (`-V`), `ansi`/`no-ansi` and `no-interaction` (`-n`). An option with one of these names or shortcuts clashes with them; use `name:` to expose a different CLI name.
 
 #### `#[CompositeInput]`
 
@@ -398,7 +400,9 @@ CliApp::create(string $name, string $version = '1.0.0'): self
 
 ## Testing
 
-Hephaestus ships a first-class testing API built on top of Symfony's `CommandTester`.
+Hephaestus ships a first-class testing API built on top of Symfony's `ApplicationTester`. Each run wraps your command in a fresh Symfony `Application`, so tests see what users see in the terminal: the same input parsing, the same global options (`-v`, `-q`, `-n`) and the same error handling.
+
+> `CommandResult` assertions use `PHPUnit\Framework\Assert`, so PHPUnit (or Pest, which ships it) must be installed as a dev dependency.
 
 ### CommandRunner
 
@@ -406,9 +410,43 @@ Hephaestus ships a first-class testing API built on top of Symfony's `CommandTes
 use Hephaestus\Testing\CommandRunner;
 
 $result = CommandRunner::for(GreetCommand::class)
-    ->withArgs(['name' => 'John'])         // positional arguments
-    ->withOptions(['yell' => true])        // options (-- prefix added automatically)
+    ->withArgs(['name' => 'John'])         // arguments, keyed by name
+    ->withOptions(['yell' => true])        // options: "--" is added to bare names, shortcuts ("-l") are kept as-is
+    ->withInputs(['yes', 'John'])          // answers to interactive questions, consumed in order
+    ->withContainer($container)            // PSR-11 container, for commands with constructor dependencies
     ->run();
+```
+
+`CommandRunner` is immutable: every `with*()` method returns a new instance and leaves the original untouched, so a base runner can be shared between tests. Calling `withArgs()`, `withOptions()` or `withInputs()` more than once merges the values; for arguments and options, later keys win.
+
+```php
+$runner = CommandRunner::for(GreetCommand::class)->withArgs(['name' => 'John']);
+
+$runner->withOptions(['yell' => true])->run();  // HELLO, JOHN!
+$runner->run();                                 // Hello, John!  (the original is unchanged)
+```
+
+Without inputs, the command runs non-interactively: questions fall back to their default answer instead of waiting on STDIN.
+
+### Failures and exceptions
+
+The runner handles failures the same way the real CLI does:
+
+- **Exceptions**, including invalid input such as a missing argument, are rendered to the error output, and the exception code becomes the exit code (`1` when the code is `0` or not numeric). Nothing is written to `output()`.
+- **Errors** (`TypeError`, `Error`, ...) are not caught. They propagate out of `run()` and fail the test, because they are bugs, not command failures.
+
+```php
+test('the exception code becomes the exit code', function () {
+    CommandRunner::for(ImportCommand::class)   // throws new RuntimeException('File not found', 3)
+        ->run()
+        ->assertExitCode(3)
+        ->assertErrorOutputContains('File not found');
+});
+
+test('bugs are not hidden behind a failed result', function () {
+    expect(fn () => CommandRunner::for(BrokenCommand::class)->run())
+        ->toThrow(TypeError::class);
+});
 ```
 
 ### CommandResult assertions
@@ -420,6 +458,7 @@ $result->assertExitCode(int $expected);             // exact exit code
 $result->assertOutputContains(string $needle);      // stdout contains substring
 $result->assertOutputEquals(string $expected);      // stdout exact match
 $result->assertErrorOutputContains(string $needle); // stderr contains substring
+$result->assertErrorOutputEquals(string $expected); // stderr exact match
 ```
 
 All assertion methods return `$this` for fluent chaining:
@@ -435,8 +474,8 @@ $result
 
 ```php
 $result->exitCode();      // int
-$result->output();        // string (stdout, trimmed)
-$result->errorOutput();   // string (stderr, trimmed)
+$result->output();        // string (stdout, line endings normalized, trimmed)
+$result->errorOutput();   // string (stderr, line endings normalized, trimmed)
 $result->isSuccessful();  // bool
 ```
 
@@ -459,6 +498,21 @@ test('shouts when yell option is set', function () {
         ->withOptions(['yell' => true])
         ->run()
         ->assertOutputEquals('HELLO, JOHN!');
+});
+
+test('asks for the name when it is not given', function () {
+    CommandRunner::for(AskNameCommand::class)
+        ->withInputs(['John'])
+        ->run()
+        ->assertSuccessful()
+        ->assertOutputContains('Hello, John!');
+});
+
+test('resolves dependencies through the container', function () {
+    CommandRunner::for(SendReportCommand::class)
+        ->withContainer($container)
+        ->run()
+        ->assertSuccessful();
 });
 
 test('fails when name argument is missing', function () {
